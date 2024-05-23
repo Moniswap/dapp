@@ -10,15 +10,18 @@ import TokenlistModal from "@/ui/modals/TokenlistModal";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CgArrowsExchangeV } from "react-icons/cg";
-import { FiChevronDown } from "react-icons/fi";
-import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+import { FiChevronDown, FiPlusSquare } from "react-icons/fi";
+import { MdKeyboardDoubleArrowRight, MdOutlineCalculate } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useChainId, useWatchBlocks } from "wagmi";
+import clsx from "clsx";
+import { IoIosSwap } from "react-icons/io";
+import { div } from "@/helpers/math";
 
 const LiquidityRouteAdapterName: React.FC<{ address: string }> = ({ address }) => {
   const { useName } = useAdapter(address as any);
   const { data } = useName();
-  return <span className="text-[#cfcfcf] font-[400] text-xs md:text-sm capitalize">{data ?? "unknown"}</span>;
+  return <span className="text-[#cfcfcf] font-[400] text-xs capitalize">{data ?? "unknown"}</span>;
 };
 
 const LiquidityRouteTokenImage: React.FC<{ address: string }> = ({ address }) => {
@@ -42,30 +45,24 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
     <div className="w-full flex flex-col items-start justify-start gap-5">
       <h3 className="capitalize font-[400] text-sm md:text-lg text-[#cfcfcf]">liquidity routing</h3>
       <div className="h-[1px] w-full bg-[#2b2b2b]" />
-      <div className="w-full relative flex justify-center items-center">
+      <div className="w-full relative flex justify-center items-center -mt-3">
         <div className="border-b border-dashed h-[1px] w-full bg-[#9a9888] absolute top-[50%]" />
-        <ul className="flex justify-between items-center w-full z-10">
+        <ul className="flex justify-between items-center w-full z-[100]">
           {tokens.map((token, index) => (
-            <li key={index}>
-              <div className="flex justify-between items-center w-full">
+            <li key={index} style={{ width: index < tokens.length - 1 ? `${(1 / tokens.length) * 100}%` : undefined }}>
+              <div className="flex justify-between items-center w-full relative">
                 <LiquidityRouteTokenImage address={token} />
                 {index < tokens.length - 1 && (
-                  <div className="flex justify-center items-center w-full mx-[200%] relative">
-                    <ul className="w-full flex flex-col justify-center items-center">
-                      <li>
-                        <div className="rounded-full p-1 bg-[#9a9888] z-10">
-                          <MdKeyboardDoubleArrowRight size={10} color="#fff" />
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex flex-col justify-center items-center absolute left-[50%] top-[50%] -z-10">
-                          <div className="w-[1px] h-8 bg-[#111]" />
-                          {/* <div className="bg-[#111] rounded-full px-3 py-3">
-                            <LiquidityRouteAdapterName address={adapters[Math.min(index, index + 1)]} />
-                          </div> */}
-                        </div>
-                      </li>
-                    </ul>
+                  <div className="flex flex-col justify-center items-center z-30 relative mt-16">
+                    <div className="rounded-full p-1 bg-[#9a9888] z-10 flex justify-center items-center">
+                      <MdKeyboardDoubleArrowRight size={10} color="#fff" />
+                    </div>
+                    <div className="flex flex-col justify-center items-center -z-40">
+                      <div className="w-[1px] h-8 bg-[#111] -mt-1" />
+                      <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2">
+                        <LiquidityRouteAdapterName address={adapters[Math.min(index, index + 1)]} />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -137,13 +134,15 @@ function Swap() {
 
   useWatchBlocks({
     onBlock: async () => {
-      await refetchBestQuery();
-      await refetchBestPath();
+      if (amount > 0) {
+        await refetchBestQuery();
+        await refetchBestPath();
+      }
     }
   });
 
   useEffect(() => {
-    if (token0Balance >= amount && amount > 0) {
+    if (amount > 0) {
       setActiveStep(3);
     } else {
       setActiveStep(-1);
@@ -155,7 +154,7 @@ function Swap() {
       <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40">
         <div className="w-full md:w-1/3 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
-            <div className="flex flex-col justify-start items-center w-full gap-12 py-4">
+            <div className="flex flex-col justify-start items-center w-full gap-6 pt-4 pb-16 relative">
               <div className="flex flex-col gap-6 justify-start items-center w-full">
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">swap</h4>
@@ -177,15 +176,19 @@ function Swap() {
                   <input
                     onChange={ev => setAmount(Number(ev.target.value))}
                     type="number"
-                    className="justify-center join-item items-start px-2.5  rounded-xl border-l border-[#2b2b2b] bg-transparent text-[#fff] font-[500] text-sm md:text-lg w-full outline-none"
+                    className={clsx({
+                      "justify-center join-item items-start px-2.5  rounded-xl border-l border-[#2b2b2b] bg-transparent text-[#fff] font-[500] text-sm md:text-lg w-full outline-none":
+                        true,
+                      "border-t border-r border-b border-y-[#ffb443] border-r-[#ffb443]": amount > token0Balance
+                    })}
                   />
                 </div>
               </div>
               {/* TO DO: Switch */}
-              <div className="w-full flex flex-col justify-center items-center">
-                <div className="bg-[#2b2b2b] w-full h-[0.9px]" />
-                <button className="btn btn-ghost btn-sm rounded-[10px] relative -top-4 bg-[#47473f] flex justify-center items-center">
-                  <CgArrowsExchangeV color="#fff" size={20} />
+              <div className="w-full flex flex-col justify-center items-center relative py-8">
+                <div className="bg-[#2b2b2b] w-full h-[1px]" />
+                <button className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center">
+                  <CgArrowsExchangeV color="#fff" size={28} />
                 </button>
               </div>
               <div className="flex flex-col gap-6 justify-start items-center w-full">
@@ -214,26 +217,78 @@ function Swap() {
                   />
                 </div>
               </div>
-              <LiquidityRoute adapters={bestPathData?.adapters ?? []} tokens={bestPathData?.path ?? []} />
+              {bestPathFetching ? (
+                <span className="loading loading-bars loading-lg text-[#f5f5f5]"></span>
+              ) : (
+                <>
+                  {bestPathData && bestPathData!.path.length > 0 && bestPathData!.adapters.length > 0 && (
+                    <LiquidityRoute adapters={bestPathData!.adapters} tokens={bestPathData!.path} />
+                  )}
+                </>
+              )}
             </div>
           </BorderlessArtboard>
         </div>
         <div className="w-full md:w-1/4 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
-            <div className="flex flex-col justify-start items-center w-full gap-10">
+            <div className="flex flex-col justify-start items-center w-full gap-10 z-50">
               <div className="flex justify-between items-center gap-3 w-full">
                 <h4 className=" text-[#fff] font-[500] capitalize text-lg md:text-xl">swap</h4>
                 <Image src="/images/hive.svg" width={60} height={60} alt="hive" />
               </div>
               <StepGroup activeStep={activeStep}>
                 <Step
+                  customIcon={activeStep >= 0 ? <MdOutlineCalculate /> : undefined}
                   content={
-                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
-                      Start by selecting the token to swap from and the amount you want to exchange
-                    </span>
+                    <>
+                      {amount <= 0 ? (
+                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                          Start by selecting the token to swap from and the amount you want to exchange
+                        </span>
+                      ) : (
+                        <>
+                          {bestQueryFetching ? (
+                            <div className="flex justify-center gap-1 items-center w-full">
+                              <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                                Searching for ideal rate...
+                              </span>
+                              <span className="loading loading-sm loading-spinner text-[#f5f5f5]"></span>
+                            </div>
+                          ) : (
+                            <>
+                              {bestQueryData && bestQueryData.adapter && bestQueryData.amountOut > 0 ? (
+                                <div className="flex flex-col justify-start items-start gap-2">
+                                  <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                                    Best exchange rate found
+                                  </span>
+                                  <div className="flex justify-center items-center w-full gap-2">
+                                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
+                                      1 {token0?.symbol}
+                                    </span>
+                                    <IoIosSwap color="#cfcfcf" size={20} />
+                                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
+                                      {(
+                                        div(Number(bestQueryData.amountOut), Math.pow(10, token0?.decimals ?? 18)) /
+                                        amount
+                                      ).toPrecision(4)}{" "}
+                                      {token1?.symbol}
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                                  No rate was found
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </>
                   }
                 />
                 <Step
+                  customIcon={activeStep >= 0 ? <FiPlusSquare /> : undefined}
                   content={
                     <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
                       Pick the token you want to exchange for

@@ -14,7 +14,7 @@ interface StepGroupProps {
 
 function Step({ active, content, customIcon, hasConnector }: StepProps) {
   return (
-    <div className="flex justify-center items-center gap-4 w-full">
+    <div className="flex justify-center items-start gap-4 w-full">
       <div className="flex flex-col justify-start items-center">
         <div
           className={`flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 text-center ${
@@ -23,9 +23,9 @@ function Step({ active, content, customIcon, hasConnector }: StepProps) {
         >
           {customIcon}
         </div>
-        {hasConnector && <div className="w-[1px] bg-[#9a9888] min-h-7 md:min-h-8" />}
+        {hasConnector && <div className="w-[1px] bg-[#9a9888] min-h-12 md:min-h-16" />}
       </div>
-      <div className="text-justify flex justify-start items-center w-auto">{content}</div>
+      <div className="text-justify flex justify-start items-start w-auto self-stretch">{content}</div>
     </div>
   );
 }
@@ -44,7 +44,7 @@ function StepGroup({ activeStep = -1, children }: StepGroupProps) {
   }, [groupMembers]);
 
   return (
-    <ul className="flex flex-col justify-start items-start">
+    <ul className="flex flex-col justify-start items-start self-stretch">
       {groupMembers.map((x, index) => (
         <li key={index}>
           {cloneElement(x as ReactElement, {
