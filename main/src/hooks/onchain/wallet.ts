@@ -1,4 +1,4 @@
-import { useAccount, useBalance, useReadContract, useWatchBlocks } from "wagmi";
+import { useAccount, useBalance, useReadContract, useWatchBlocks, useWriteContract } from "wagmi";
 import { erc20Abi } from "@/assets/abis";
 
 export function useNativeBalance() {
@@ -51,4 +51,33 @@ export function useERC20Balance(tokenAddress: `0x${string}`) {
   });
 
   return { balance: !!balance && !!decimals ? Number(balance) / Math.pow(10, decimals) : 0, isLoading, isError };
+}
+
+export function useERC20Allowance(tokenAddress: `0x${string}`) {
+  const { address } = useAccount();
+
+  const useAllowance = (acc: `0x${string}`) =>
+    useReadContract({
+      address: tokenAddress,
+      abi: erc20Abi,
+      functionName: "allowance",
+      args: [address ? address : "0x", acc]
+    });
+
+  const useApproval = (acc: `0x${string}`, amount: number) => {
+    const { writeContract, isError, isSuccess, isPending, data: hash } = useWriteContract();
+
+    const executeApproval = () =>
+      writeContract({
+        abi: erc20Abi,
+        account: address,
+        address: tokenAddress,
+        functionName: "approve",
+        args: [acc, BigInt(amount)]
+      });
+
+    return { executeApproval, isError, isSuccess, isPending, hash };
+  };
+
+  return { useAllowance, useApproval };
 }

@@ -2,16 +2,12 @@ import { adapterAbi, aggregatorRouterAbi } from "@/assets/abis";
 import { __AGGREGATOR_ROUTERS__ } from "@/constants";
 import { useMemo } from "react";
 import { useAccount, useChainId, useReadContract, useWriteContract } from "wagmi";
-import { useMutatedConfig } from "../_";
 
 const SWAP_FEE = 99;
 
 export function useAdapter(address: `0x${string}`) {
-  const config = useMutatedConfig();
-
   const useName = () =>
     useReadContract({
-      config,
       abi: adapterAbi,
       address,
       functionName: "name"
@@ -22,13 +18,11 @@ export function useAdapter(address: `0x${string}`) {
 
 export function useAggregatorRouter() {
   const chainId = useChainId();
-  const config = useMutatedConfig();
   const { address } = useAccount();
   const routerAddress = useMemo(() => __AGGREGATOR_ROUTERS__[chainId], [chainId]);
 
   const useFindBestPath = (amountIn: number, tokenIn: `0x${string}`, tokenOut: `0x${string}`, maxSteps: number = 4) =>
     useReadContract({
-      config,
       abi: aggregatorRouterAbi,
       address: routerAddress as `0x${string}`,
       functionName: "findBestPath",
@@ -37,30 +31,36 @@ export function useAggregatorRouter() {
 
   const useBestQuery = (tokenIn: `0x${string}`, tokenOut: `0x${string}`, amountIn: number) =>
     useReadContract({
-      config,
       abi: aggregatorRouterAbi,
       address: routerAddress as `0x${string}`,
       functionName: "query",
       args: [tokenIn, tokenOut, BigInt(amountIn)]
     });
 
-  const useSwap = (trade: {
-    amountIn: bigint;
-    amountOut: bigint;
-    path: readonly `0x${string}`[];
-    adapters: readonly `0x${string}`[];
-  }) => {
-    const { writeContract, isError, isSuccess, isPending, data: hash } = useWriteContract({ config });
+  const useSwap = (
+    trade: {
+      amountIn: bigint;
+      amountOut: bigint;
+      path: readonly `0x${string}`[];
+      adapters: readonly `0x${string}`[];
+    },
+    onSuccess?: () => any
+  ) => {
+    const { writeContract, isError, isSuccess, isPending, data: hash, reset, error } = useWriteContract();
 
     const executeSwap = () =>
-      writeContract({
-        abi: aggregatorRouterAbi,
-        address: routerAddress as `0x${string}`,
-        functionName: "swap",
-        args: [trade, address as `0x${string}`, BigInt(SWAP_FEE)]
-      });
+      writeContract(
+        {
+          abi: aggregatorRouterAbi,
+          address: routerAddress as `0x${string}`,
+          functionName: "swap",
+          args: [trade, address as `0x${string}`, BigInt(SWAP_FEE)],
+          account: address
+        },
+        { onSuccess, onError: err => console.error(err.stack) }
+      );
 
-    return { executeSwap, isError, isSuccess, isPending, hash };
+    return { executeSwap, isError, isSuccess, isPending, hash, reset, error };
   };
 
   return { useFindBestPath, useSwap, useBestQuery };

@@ -11,19 +11,22 @@ export const __CHAIN_INFO__ = {
     name: "bera testnet",
     image: "/images/berachain.svg",
     chainIDHex: toHex(__CHAIN_IDS__.bera_testnet),
-    isTestnet: true
+    isTestnet: true,
+    explorer: "https://artio.beratrail.io"
   },
   [__CHAIN_IDS__.sepolia]: {
     name: "Ethereum Sepolia",
     image: "/images/ethereum.svg",
     chainIDHex: toHex(__CHAIN_IDS__.sepolia),
-    isTestnet: true
+    isTestnet: true,
+    explorer: "https://sepolia.etherscan.io"
   },
   [__CHAIN_IDS__.bsc_testnet]: {
     name: "BSC Testnet",
     image: "/images/smartchain.svg",
     chainIDHex: toHex(__CHAIN_IDS__.bsc_testnet),
-    isTestnet: true
+    isTestnet: true,
+    explorer: "https://testnet.bscscan.com"
   }
 };
 
