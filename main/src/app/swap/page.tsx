@@ -3,7 +3,7 @@
 import { RootState } from "@/configs/store";
 import { setFirstSelectedToken, setSecondSelectedToken } from "@/configs/store/slices/tokensSlice";
 import { useAdapter, useAggregatorRouter } from "@/hooks/onchain/swap";
-import { useERC20Allowance, useERC20Balance } from "@/hooks/onchain/wallet";
+import { useERC20Allowance, useERC20Balance, useNativeBalance } from "@/hooks/onchain/wallet";
 import { Step, StepGroup } from "@/ui/Step";
 import BorderlessArtboard from "@/ui/artboards/BorderlessArtboard";
 import TokenlistModal from "@/ui/modals/TokenlistModal";
@@ -17,7 +17,7 @@ import { useAccount, useChainId, useWatchBlocks } from "wagmi";
 import clsx from "clsx";
 import { IoIosSwap } from "react-icons/io";
 import { div, mul, sub } from "@/helpers/math";
-import { __AGGREGATOR_ROUTERS__, __CHAIN_INFO__ } from "@/constants";
+import { __AGGREGATOR_ROUTERS__, __CHAIN_INFO__, __ETHER__, __WRAPPED_ETHER__ } from "@/constants";
 import { FaLock, FaUnlockKeyhole } from "react-icons/fa6";
 import { PiConfetti } from "react-icons/pi";
 
@@ -48,7 +48,7 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
     <div className="w-full flex flex-col items-start justify-start gap-5">
       <h3 className="capitalize font-[400] text-sm md:text-lg text-[#cfcfcf]">liquidity routing</h3>
       <div className="h-[1px] w-full bg-[#2b2b2b]" />
-      <div className="w-full relative flex justify-center items-center -mt-3">
+      <div className="w-full relative flex justify-center items-center -mt-3 overflow-x-auto">
         <div className="border-b border-dashed h-[1px] w-full bg-[#9a9888] absolute top-[50%]" />
         <ul className="flex justify-between items-center w-full z-[100]">
           {tokens.map((token, index) => (
@@ -77,7 +77,7 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
   );
 };
 
-function Swap() {
+const Swap: React.FC = () => {
   const dispatch = useDispatch();
   const tokenlistModal0 = useRef<HTMLInputElement>(null);
   const tokenlistModal1 = useRef<HTMLInputElement>(null);
@@ -98,12 +98,25 @@ function Swap() {
   const [amount, setAmount] = useState(0);
   const [activeStep, setActiveStep] = useState(-1);
 
+  // Wrapped ETHER
+  const wrappedEther = useMemo(() => __WRAPPED_ETHER__[chainId], [chainId]);
+
   // Router
   const router = useMemo(() => __AGGREGATOR_ROUTERS__[chainId], [chainId]);
 
-  // Balances
-  const { balance: token0Balance } = useERC20Balance(tknStateData.firstSelectedToken as any);
-  const { balance: token1Balance } = useERC20Balance(tknStateData.secondSelectedToken as any);
+  // Token addresses
+  const address0 = useMemo(
+    () => (tknStateData.firstSelectedToken === __ETHER__ ? wrappedEther : tknStateData.firstSelectedToken),
+    [tknStateData.firstSelectedToken, wrappedEther]
+  );
+  const address1 = useMemo(
+    () => (tknStateData.secondSelectedToken === __ETHER__ ? wrappedEther : tknStateData.secondSelectedToken),
+    [tknStateData.secondSelectedToken, wrappedEther]
+  );
+
+  const { balance: etherBalance } = useNativeBalance();
+  const { balance: token0Balance } = useERC20Balance(address0 as any);
+  const { balance: token1Balance } = useERC20Balance(address1 as any);
 
   // Wallet settings
   const slippage = useSelector((state: RootState) => state.wallet.slippageTolerance);
@@ -115,11 +128,7 @@ function Swap() {
     isFetching: bestQueryFetching,
     isError: bestQueryError,
     refetch: refetchBestQuery
-  } = useBestQuery(
-    tknStateData.firstSelectedToken as any,
-    tknStateData.secondSelectedToken as any,
-    amount * Math.pow(10, token0?.decimals ?? 18)
-  );
+  } = useBestQuery(address0 as any, address1 as any, amount * Math.pow(10, token0?.decimals ?? 18));
   const amountOutFormatted = useMemo(
     () => div(Number(bestQueryData?.amountOut ?? 0), Math.pow(10, token1?.decimals ?? 18)),
     [bestQueryData?.amountOut, token1?.decimals]
@@ -127,14 +136,8 @@ function Swap() {
   const {
     data: bestPathData,
     isFetching: bestPathFetching,
-    isError: bestPathError,
     refetch: refetchBestPath
-  } = useFindBestPath(
-    amount * Math.pow(10, token0?.decimals ?? 18),
-    tknStateData.firstSelectedToken as any,
-    tknStateData.secondSelectedToken as any,
-    3
-  );
+  } = useFindBestPath(amount * Math.pow(10, token0?.decimals ?? 18), address0 as any, address1 as any);
   const {
     executeSwap,
     isError: swapError,
@@ -153,7 +156,7 @@ function Swap() {
   const txUrl = useMemo(() => __CHAIN_INFO__[chainId].explorer.concat(`/tx/${swapHash}`), [chainId, swapHash]);
 
   // Wallet-relevant on-chain functions
-  const { useAllowance, useApproval } = useERC20Allowance(tknStateData.firstSelectedToken as any);
+  const { useAllowance, useApproval } = useERC20Allowance(address0 as any);
   const {
     data: allowance,
     isFetching: allowanceFetching,
@@ -164,12 +167,10 @@ function Swap() {
     () => div(Number(allowance ?? 0), Math.pow(10, token0?.decimals ?? 18)),
     [allowance, token0?.decimals]
   );
-  const {
-    executeApproval,
-    isError: approvalError,
-    isPending: approvalPending,
-    isSuccess: approvalSuccess
-  } = useApproval(router as any, mul(amount, Math.pow(10, token0?.decimals ?? 18)));
+  const { executeApproval, isPending: approvalPending } = useApproval(
+    router as any,
+    mul(amount, Math.pow(10, token0?.decimals ?? 18))
+  );
 
   useWatchBlocks({
     onBlock: async () => {
@@ -199,7 +200,11 @@ function Swap() {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">swap</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {token0Balance.toPrecision(4)} {token0?.symbol}
+                    available{" "}
+                    {tknStateData.firstSelectedToken === __ETHER__
+                      ? etherBalance.toPrecision(4)
+                      : token0Balance.toPrecision(4)}{" "}
+                    {token0?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -235,7 +240,11 @@ function Swap() {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className=" text-[#fff] font-[500] capitalize text-sm md:text-lg">for</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {token1Balance.toPrecision(4)} {token1?.symbol}
+                    available{" "}
+                    {tknStateData.secondSelectedToken === __ETHER__
+                      ? etherBalance.toPrecision(4)
+                      : token1Balance.toPrecision(4)}{" "}
+                    {token1?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -436,7 +445,7 @@ function Swap() {
                           }}
                           className="flex justify-center items-center cursor-pointer"
                         >
-                          <span className="text-[#cfcfcf] text-sm underline">Reset</span>
+                          <span className="text-[#cfcfcf] text-sm underline capitalize">reset</span>
                         </a>
                       </div>
                     }
@@ -500,6 +509,6 @@ function Swap() {
       />
     </>
   );
-}
+};
 
 export default Swap;

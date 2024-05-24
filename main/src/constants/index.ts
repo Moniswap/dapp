@@ -184,3 +184,16 @@ export const __LANGUAGES__ = {
 export const __AGGREGATOR_ROUTERS__ = {
   [__CHAIN_IDS__.bsc_testnet]: "0xA2Af4FAe0d22608E3d34698F03ba4c4f75201a73"
 };
+
+export const __PROTOCOL_ROUTERS__ = {
+  [__CHAIN_IDS__.bsc_testnet]: "0xc6b776fAD24f4ac2120ff35c88f3a0B83b9f5b29"
+};
+
+export const __POOL_FACTORIES__ = {
+  [__CHAIN_IDS__.bsc_testnet]: "0x0542fd4b76074eD67d3031D197119e87c4C7d1FA"
+};
+
+export const __ETHER__ = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const __WRAPPED_ETHER__ = {
+  [__CHAIN_IDS__.bsc_testnet]: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
+};
