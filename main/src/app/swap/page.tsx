@@ -133,6 +133,7 @@ const Swap: React.FC = () => {
     () => div(Number(bestQueryData?.amountOut ?? 0), Math.pow(10, token1?.decimals ?? 18)),
     [bestQueryData?.amountOut, token1?.decimals]
   );
+
   const {
     data: bestPathData,
     isFetching: bestPathFetching,
@@ -148,7 +149,10 @@ const Swap: React.FC = () => {
   } = useSwap({
     amountIn: BigInt(mul(amount, Math.pow(10, token0?.decimals ?? 18))),
     amountOut: BigInt(
-      mul(sub(amountOutFormatted, mul(slippage / 100, amountOutFormatted)), Math.pow(10, token1?.decimals ?? 18))
+      mul(
+        sub(parseFloat(amountOutFormatted.toFixed(2)), mul(slippage / 100, parseFloat(amountOutFormatted.toFixed(2)))),
+        Math.pow(10, token1?.decimals ?? 18)
+      )
     ),
     path: bestPathData?.path ?? [],
     adapters: bestPathData?.adapters ?? []
@@ -192,7 +196,7 @@ const Swap: React.FC = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40">
+      <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40 animate-fade-down animate-once">
         <div className="w-full md:w-1/3 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
             <div className="flex flex-col justify-start items-center w-full gap-6 pt-4 pb-16 relative">
@@ -219,8 +223,9 @@ const Swap: React.FC = () => {
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
-                    onChange={ev => setAmount(Number(ev.target.value))}
+                    onChange={ev => setAmount(Number(parseFloat(ev.target.value).toFixed(3)))}
                     type="number"
+                    step={0.0001}
                     className={clsx({
                       "justify-center join-item items-start px-2.5  rounded-xl border-l border-[#2b2b2b] bg-transparent text-[#fff] font-[500] text-sm md:text-lg w-full outline-none":
                         true,

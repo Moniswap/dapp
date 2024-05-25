@@ -1,0 +1,7 @@
+query IndexSinglePair($id: ID!) {
+  pair(id: $id) {
+    id
+    volumeUSD
+    untrackedVolumeUSD
+  }
+}

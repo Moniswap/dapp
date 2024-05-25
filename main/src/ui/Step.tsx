@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode, Children, useEffect, ReactElement, cloneElement } from "react";
+import clsx from "clsx";
 
 interface StepProps {
   active?: boolean;
@@ -17,9 +18,13 @@ function Step({ active, content, customIcon, hasConnector }: StepProps) {
     <div className="flex justify-center items-start gap-4 w-full">
       <div className="flex flex-col justify-start items-center">
         <div
-          className={`flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 text-center ${
-            active ? "text-[#34d22c]" : "text-[#fff] font-[500] text-sm md:text-lg"
-          }`}
+          className={clsx(
+            "flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 text-center",
+            {
+              "text-[#34d22c]": active,
+              "text-[#fff] font-[500] text-sm md:text-lg": !active
+            }
+          )}
         >
           {customIcon}
         </div>

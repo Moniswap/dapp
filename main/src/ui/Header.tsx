@@ -103,7 +103,7 @@ function Header() {
                   </li>
                 )}
                 <li>
-                  <ActiveLink href="#">
+                  <ActiveLink href="/liquidity">
                     <span className="capitalize text-lg">liquidity</span>
                   </ActiveLink>
                 </li>
@@ -254,7 +254,7 @@ function Header() {
               <ActiveFloatingLink href="#">
                 <span className="capitalize">dashboard</span>
               </ActiveFloatingLink>
-              <ActiveFloatingLink href="#">
+              <ActiveFloatingLink href="/liquidity">
                 <span className="capitalize">liquidity</span>
               </ActiveFloatingLink>
               <ActiveFloatingLink href="#">

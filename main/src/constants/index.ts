@@ -197,3 +197,7 @@ export const __ETHER__ = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const __WRAPPED_ETHER__ = {
   [__CHAIN_IDS__.bsc_testnet]: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
 };
+
+export const __GRAPH_CHAIN_NAMES__ = {
+  [__CHAIN_IDS__.bsc_testnet]: "bscTestnet"
+};

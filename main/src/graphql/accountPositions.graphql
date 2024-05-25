@@ -1,0 +1,8 @@
+query IndexAccountPositions($account: Bytes!) {
+  accountPositions(where: { account: $account }) {
+    id
+    pair {
+      id
+    }
+  }
+}
