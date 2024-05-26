@@ -7,6 +7,7 @@ interface ButtonGroupItemProps {
   children: ReactNode;
   onClickAction?: (index?: number) => any;
   totalButtonItems?: number;
+  alt?: boolean;
 }
 
 interface ButtonGroupProps {
@@ -15,13 +16,15 @@ interface ButtonGroupProps {
   onSingleItemClick?: (index: number) => any;
 }
 
-function ButtonGroupItem({ active, index, children, onClickAction, totalButtonItems }: ButtonGroupItemProps) {
+function ButtonGroupItem({ active, index, children, onClickAction, totalButtonItems, alt }: ButtonGroupItemProps) {
   return (
     <button
       onClick={() => onClickAction && onClickAction(index)}
       className={clsx("join-item flex justify-center items-center px-2 md:px-4 py-1 md:py-3 text-[#fff]", {
-        "bg-[#ffb443]": active,
-        "bg-[#0c0c0b]": !active,
+        "bg-[#ffb443]": active && !alt,
+        "bg-[#0c0c0b]": !active && !alt,
+        "bg-[#fc8415]": active && alt,
+        "bg-[#1e1e1e]": !active && alt,
         "rounded-l-[12.8px]": index === 0,
         "rounded-r-[12.8px]": !!totalButtonItems && index === totalButtonItems - 1
       })}

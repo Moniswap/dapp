@@ -1,9 +1,10 @@
 "use client";
 
 import { RootState } from "@/configs/store";
-import { useFactoryInfo } from "@/hooks/offchain/core";
+import { useAllPools, useFactoryInfo } from "@/hooks/offchain/core";
 import { ButtonGroup, ButtonGroupItem } from "@/ui/ButtonGroup";
 import BorderlessArtboard from "@/ui/artboards/BorderlessArtboard";
+import Pools from "@/ui/list/Pools";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,6 +15,8 @@ import { FiSearch } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useChainId } from "wagmi";
 
+type POOL_TYPES = "active" | "stable" | "volatile" | "low-tvl" | "incentivized" | "participating" | "all";
+
 const Liquidity: React.FC = () => {
   const chainId = useChainId();
   const tokensState = useSelector((state: RootState) => state.tokens);
@@ -22,6 +25,7 @@ const Liquidity: React.FC = () => {
   const currentPath = usePathname();
 
   const factoryInfo = useFactoryInfo();
+  const pools = useAllPools(factoryInfo?.pairCount);
   return (
     <div className="container mx-auto flex flex-col gap-10 px-3 my-12 animate-fade-down animate-once">
       <div className="flex w-full flex-col md:flex-row justify-start md:justify-around items-center gap-10">
@@ -38,7 +42,16 @@ const Liquidity: React.FC = () => {
                 <div className="bg-[#282828] rounded-[12.8px] flex justify-center items-center px-3 py-3 w-full md:w-auto">
                   <span className="text-xs md:text-sm font-[400] text-[#cfcfcf] uppercase">
                     tvl ~$
-                    {parseFloat(factoryInfo?.totalLiquidityUSD).toLocaleString("en-US", {
+                    {parseFloat(factoryInfo?.totalLiquidityUSD ?? "0").toLocaleString("en-US", {
+                      useGrouping: true,
+                      maximumFractionDigits: 3
+                    })}
+                  </span>
+                </div>
+                <div className="bg-[#282828] rounded-[12.8px] flex justify-center items-center px-3 py-3 w-full md:w-auto">
+                  <span className="text-xs md:text-sm font-[400] text-[#cfcfcf] capitalize">
+                    fees ~$
+                    {parseFloat(factoryInfo?.feesUSD ?? "0").toLocaleString("en-US", {
                       useGrouping: true,
                       maximumFractionDigits: 3
                     })}
@@ -47,15 +60,10 @@ const Liquidity: React.FC = () => {
                 <div className="bg-[#282828] rounded-[12.8px] flex justify-center items-center px-3 py-3 w-full md:w-auto">
                   <span className="text-xs md:text-sm font-[400] text-[#cfcfcf] capitalize">
                     volume ~$
-                    {parseFloat(factoryInfo?.totalVolumeUSD).toLocaleString("en-US", {
+                    {parseFloat(factoryInfo?.totalVolumeUSD ?? "0").toLocaleString("en-US", {
                       useGrouping: true,
                       maximumFractionDigits: 3
                     })}
-                  </span>
-                </div>
-                <div className="bg-[#282828] rounded-[12.8px] flex justify-center items-center px-3 py-3 w-full md:w-auto">
-                  <span className="text-xs md:text-sm font-[400] text-[#cfcfcf] capitalize">
-                    pools ~{factoryInfo?.pairCount.toLocaleString("en-US", { useGrouping: true })}
                   </span>
                 </div>
               </div>
@@ -134,6 +142,7 @@ const Liquidity: React.FC = () => {
           </div>
         </div>
       </div>
+      <Pools data={pools} />
     </div>
   );
 };

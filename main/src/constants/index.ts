@@ -193,6 +193,7 @@ export const __POOL_FACTORIES__ = {
   [__CHAIN_IDS__.bsc_testnet]: "0x0542fd4b76074eD67d3031D197119e87c4C7d1FA"
 };
 
+export const __ADDRESS_0__ = "0x0000000000000000000000000000000000000000";
 export const __ETHER__ = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const __WRAPPED_ETHER__ = {
   [__CHAIN_IDS__.bsc_testnet]: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
@@ -201,3 +202,5 @@ export const __WRAPPED_ETHER__ = {
 export const __GRAPH_CHAIN_NAMES__ = {
   [__CHAIN_IDS__.bsc_testnet]: "bscTestnet"
 };
+
+export const __IDEAL_GAS__ = BigInt(400000);

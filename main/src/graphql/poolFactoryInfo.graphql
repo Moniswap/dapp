@@ -5,5 +5,6 @@ query IndexPoolFactoryInfo($id: ID!) {
     totalVolumeUSD
     totalLiquidityUSD
     txCount
+    feesUSD
   }
 }

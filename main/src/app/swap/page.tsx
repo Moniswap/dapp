@@ -117,6 +117,14 @@ const Swap: React.FC = () => {
   const { balance: etherBalance } = useNativeBalance();
   const { balance: token0Balance } = useERC20Balance(address0 as any);
   const { balance: token1Balance } = useERC20Balance(address1 as any);
+  const balance0 = useMemo(
+    () => (tknStateData.firstSelectedToken === __ETHER__ ? etherBalance : token0Balance),
+    [etherBalance, tknStateData.firstSelectedToken, token0Balance]
+  );
+  const balance1 = useMemo(
+    () => (tknStateData.secondSelectedToken === __ETHER__ ? etherBalance : token1Balance),
+    [etherBalance, tknStateData.secondSelectedToken, token1Balance]
+  );
 
   // Wallet settings
   const slippage = useSelector((state: RootState) => state.wallet.slippageTolerance);
@@ -147,7 +155,7 @@ const Swap: React.FC = () => {
     hash: swapHash,
     reset: resetSwap
   } = useSwap({
-    amountIn: BigInt(mul(amount, Math.pow(10, token0?.decimals ?? 18))),
+    amountIn: BigInt(mul(Number(amount.toFixed(3)), Math.pow(10, token0?.decimals ?? 18))),
     amountOut: BigInt(
       mul(
         sub(parseFloat(amountOutFormatted.toFixed(2)), mul(slippage / 100, parseFloat(amountOutFormatted.toFixed(2)))),
@@ -204,11 +212,7 @@ const Swap: React.FC = () => {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">swap</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available{" "}
-                    {tknStateData.firstSelectedToken === __ETHER__
-                      ? etherBalance.toPrecision(4)
-                      : token0Balance.toPrecision(4)}{" "}
-                    {token0?.symbol}
+                    available {balance0.toPrecision(4)} {token0?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -229,7 +233,7 @@ const Swap: React.FC = () => {
                     className={clsx({
                       "justify-center join-item items-start px-2.5  rounded-xl border-l border-[#2b2b2b] bg-transparent text-[#fff] font-[500] text-sm md:text-lg w-full outline-none":
                         true,
-                      "border-t border-r border-b border-y-[#ffb443] border-r-[#ffb443]": amount > token0Balance
+                      "border-t border-r border-b border-y-[#ffb443] border-r-[#ffb443]": amount > balance0
                     })}
                   />
                 </div>
@@ -245,11 +249,7 @@ const Swap: React.FC = () => {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className=" text-[#fff] font-[500] capitalize text-sm md:text-lg">for</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available{" "}
-                    {tknStateData.secondSelectedToken === __ETHER__
-                      ? etherBalance.toPrecision(4)
-                      : token1Balance.toPrecision(4)}{" "}
-                    {token1?.symbol}
+                    available {balance1.toPrecision(4)} {token1?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -373,7 +373,7 @@ const Swap: React.FC = () => {
                     </>
                   }
                 />
-                {amount > 0 && (
+                {amount > 0 && tknStateData.firstSelectedToken !== __ETHER__ && (
                   <Step
                     customIcon={
                       allowanceFetching ? (
@@ -402,7 +402,11 @@ const Swap: React.FC = () => {
                                   Allowance too low for {token0?.symbol}
                                 </span>
                                 <button
-                                  disabled={allowedToSpend >= amount || !isConnected}
+                                  disabled={
+                                    allowedToSpend >= amount ||
+                                    !isConnected ||
+                                    tknStateData.firstSelectedToken === __ETHER__
+                                  }
                                   onClick={executeApproval}
                                   className="bg-[#1e1e1e] border border-[#2b2b2b] capitalize px-4 py-3 flex justify-center items-center rounded-[12.8px] gap-2"
                                 >
@@ -484,7 +488,7 @@ const Swap: React.FC = () => {
                 </span>
               </li>
             </ul> */}
-              {allowedToSpend >= amount && amount > 0 && (
+              {(allowedToSpend >= amount || tknStateData.firstSelectedToken === __ETHER__) && amount > 0 && (
                 <button
                   disabled={swapPending || !isConnected}
                   onClick={executeSwap}

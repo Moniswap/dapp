@@ -1,5 +1,5 @@
-query IndexSinglePair($id: ID!) {
-  pair(id: $id) {
+query IndexAllPools($first: Int = 6000) {
+  pairs(first: $first, skip: 0) {
     id
     stable
     volumeUSD

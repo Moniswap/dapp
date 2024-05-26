@@ -3,11 +3,12 @@ import * as React from "react";
 import Image from "next/image";
 import { forwardRef } from "react";
 import { customEllipsize } from "@/helpers/utils";
-import { useERC20Balance } from "@/hooks/onchain/wallet";
+import { useERC20Balance, useNativeBalance } from "@/hooks/onchain/wallet";
 import { FiSearch, FiX } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/configs/store";
 import { useChainId } from "wagmi";
+import { __ETHER__ } from "@/constants";
 
 interface ModalProps {
   close?: () => any;
@@ -23,7 +24,12 @@ interface ListItemProps {
 }
 
 const ListItem: React.FC<ListItemProps> = ({ tokenAddress, disabled, imgSrc, tokenSymbol, onItemPressed }) => {
-  const { balance, isError, isLoading } = useERC20Balance(tokenAddress as `0x${string}`);
+  const { balance: erc20Balance, isLoading } = useERC20Balance(tokenAddress as `0x${string}`);
+  const { balance: nativeBalance } = useNativeBalance();
+  const balance = React.useMemo(
+    () => (tokenAddress === __ETHER__ ? nativeBalance : erc20Balance),
+    [erc20Balance, nativeBalance, tokenAddress]
+  );
   return (
     <button
       disabled={disabled}
@@ -41,9 +47,7 @@ const ListItem: React.FC<ListItemProps> = ({ tokenAddress, disabled, imgSrc, tok
         {isLoading ? (
           <span className="loading loading-spinner loading-sm md:loading-md text-[#fff]"></span>
         ) : (
-          <h3 className="uppercase font-[500]  text-lg md:text-xl text-[#cfcfcf]">
-            {!isError ? balance.toPrecision(4) : 0}
-          </h3>
+          <h3 className="uppercase font-[500]  text-lg md:text-xl text-[#cfcfcf]">{balance.toPrecision(4)}</h3>
         )}
         <span className="text-[#7d7d7d] font-[400]  text-sm md:text-lg">$0.0025</span>
       </div>

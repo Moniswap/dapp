@@ -6,7 +6,7 @@ const router = Router();
 router.get("/tokenlist/:chainId", (req, res, next) => {
   try {
     const parsedChainId = parseInt(req.params.chainId);
-    const result = tokens[parsedChainId];
+    const result = tokens[parsedChainId].sort((a, b) => a.symbol - b.symbol);
     return res.status(200).json({ result });
   } catch (error) {
     return next(error);
