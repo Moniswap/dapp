@@ -15,11 +15,11 @@ interface StepGroupProps {
 
 function Step({ active, content, customIcon, hasConnector }: StepProps) {
   return (
-    <div className="flex justify-center items-start gap-4 w-full">
-      <div className="flex flex-col justify-start items-center self-stretch">
+    <div className="flex justify-center gap-4 items-start w-full">
+      <div className="flex flex-col justify-center items-center w-auto flex-wrap">
         <div
           className={clsx(
-            "flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 text-center",
+            "flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 text-center z-10",
             {
               "text-[#34d22c]": active,
               "text-[#fff] font-[500] text-sm md:text-lg": !active
@@ -28,9 +28,9 @@ function Step({ active, content, customIcon, hasConnector }: StepProps) {
         >
           {customIcon}
         </div>
-        {hasConnector && <div className="w-[1px] bg-[#9a9888] min-h-12 md:min-h-16" />}
+        {hasConnector && <div className="bg-[#9a9888] h-auto w-[2px] min-h-3 md:min-h-5 flex flex-1 overflow-hidden" />}
       </div>
-      <div className="text-justify flex justify-start items-start w-auto">{content}</div>
+      <div className="flex">{content}</div>
     </div>
   );
 }
@@ -49,7 +49,7 @@ function StepGroup({ activeStep = -1, children }: StepGroupProps) {
   }, [groupMembers]);
 
   return (
-    <ul className="flex flex-col justify-start items-start self-stretch gap-0">
+    <ul className="flex flex-col flex-nowrap justify-start items-center w-fit h-full">
       {groupMembers.map((x, index) => (
         <li key={index}>
           {cloneElement(x as ReactElement, {

@@ -97,7 +97,7 @@ function Header() {
                 </li>
                 {isConnected && (
                   <li>
-                    <ActiveLink href="#">
+                    <ActiveLink href="/dashboard">
                       <span className="capitalize text-lg">dashboard</span>
                     </ActiveLink>
                   </li>
@@ -251,7 +251,7 @@ function Header() {
               <ActiveFloatingLink href="/swap">
                 <span className="capitalize">swap</span>
               </ActiveFloatingLink>
-              <ActiveFloatingLink href="#">
+              <ActiveFloatingLink href="/dashboard">
                 <span className="capitalize">dashboard</span>
               </ActiveFloatingLink>
               <ActiveFloatingLink href="/liquidity">

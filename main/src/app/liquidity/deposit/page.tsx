@@ -26,6 +26,7 @@ import { useSinglePoolInfo } from "@/hooks/offchain/core";
 import { BsExclamationCircle } from "react-icons/bs";
 import { LuDot } from "react-icons/lu";
 import { useSearchParams } from "next/navigation";
+import { formatUnits } from "viem";
 
 const Deposit: React.FC = () => {
   const dispatch = useDispatch();
@@ -173,6 +174,19 @@ const Deposit: React.FC = () => {
   // Off-chain indexing
   const indexedPool = useSinglePoolInfo(poolAddress?.toLowerCase());
 
+  // Calculate positions
+  const { balance: position } = useERC20Balance(poolAddress as any);
+  const formattedTS = useMemo(() => Number(formatUnits(totalSupply ?? BigInt(1), 18)), [totalSupply]);
+  const positionRatio = useMemo(() => div(position, formattedTS), [formattedTS, position]);
+  const token0Deposited = useMemo(
+    () => positionRatio * Number(indexedPool?.reserve0 ?? "0"),
+    [indexedPool?.reserve0, positionRatio]
+  );
+  const token1Deposited = useMemo(
+    () => positionRatio * Number(indexedPool?.reserve1 ?? "0"),
+    [indexedPool?.reserve1, positionRatio]
+  );
+
   const switchTokens = useCallback(() => {
     const t0 = tknStateData.firstSelectedToken;
     const t1 = tknStateData.secondSelectedToken;
@@ -291,6 +305,20 @@ const Deposit: React.FC = () => {
                   <span className="text-[#cfcfcf] text-lg">
                     {indexedPool
                       ? `${Number(indexedPool.reserve1).toPrecision(3)} ${indexedPool.token1.symbol}`
+                      : `0.00 ${token1?.symbol}`}
+                  </span>
+                </div>
+
+                <div className="flex flex-col justify-start items-end gap-2">
+                  <h3 className="text-[#7d7d7d] font-[400] text-sm capitalize">your positiom</h3>
+                  <span className="text-[#cfcfcf] text-lg">
+                    {indexedPool
+                      ? `${token0Deposited.toPrecision(3)} ${indexedPool.token0.symbol}`
+                      : `0.00 ${token0?.symbol}`}
+                  </span>
+                  <span className="text-[#cfcfcf] text-lg">
+                    {indexedPool
+                      ? `${token1Deposited.toPrecision(3)} ${indexedPool.token1.symbol}`
                       : `0.00 ${token1?.symbol}`}
                   </span>
                 </div>

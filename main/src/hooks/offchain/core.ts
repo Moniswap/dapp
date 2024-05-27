@@ -10,7 +10,9 @@ import {
   IndexManyPoolsUsingIDsDocument,
   IndexAllPoolsDocument,
   IndexAccountPositionsDocument,
-  type AccountPosition
+  type AccountPosition,
+  type Fee,
+  IndexFeesDocument
 } from "../../../.graphclient";
 
 export function useFactoryInfo() {
@@ -82,4 +84,19 @@ export function usePoolPositions() {
   }, [address]);
 
   return positions;
+}
+
+export function usePoolRewards() {
+  const [rewards, setRewards] = useState<Fee[]>([]);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    if (address) {
+      execute(IndexFeesDocument, {})
+        .then(({ data }) => setRewards(data.fees))
+        .catch(console.debug);
+    }
+  }, [address]);
+
+  return rewards;
 }
