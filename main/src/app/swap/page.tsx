@@ -8,7 +8,7 @@ import { Step, StepGroup } from "@/ui/Step";
 import BorderlessArtboard from "@/ui/artboards/BorderlessArtboard";
 import TokenlistModal from "@/ui/modals/TokenlistModal";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CgArrowsExchangeV } from "react-icons/cg";
 import { FiChevronDown, FiExternalLink, FiPlusSquare } from "react-icons/fi";
 import { MdKeyboardDoubleArrowRight, MdOutlineCalculate, MdOutlineError } from "react-icons/md";
@@ -158,7 +158,7 @@ const Swap: React.FC = () => {
     amountIn: BigInt(mul(Number(amount.toFixed(3)), Math.pow(10, token0?.decimals ?? 18))),
     amountOut: BigInt(
       mul(
-        sub(parseFloat(amountOutFormatted.toFixed(2)), mul(slippage / 100, parseFloat(amountOutFormatted.toFixed(2)))),
+        sub(parseFloat(amountOutFormatted.toFixed(3)), mul(slippage / 100, parseFloat(amountOutFormatted.toFixed(2)))),
         Math.pow(10, token1?.decimals ?? 18)
       )
     ),
@@ -183,6 +183,14 @@ const Swap: React.FC = () => {
     router as any,
     mul(amount, Math.pow(10, token0?.decimals ?? 18))
   );
+
+  const switchTokens = useCallback(() => {
+    const t0 = tknStateData.firstSelectedToken;
+    const t1 = tknStateData.secondSelectedToken;
+
+    dispatch(setFirstSelectedToken({ chainId, address: t1 }));
+    dispatch(setSecondSelectedToken({ chainId, address: t0 }));
+  }, [chainId, dispatch, tknStateData.firstSelectedToken, tknStateData.secondSelectedToken]);
 
   useWatchBlocks({
     onBlock: async () => {
@@ -227,7 +235,7 @@ const Swap: React.FC = () => {
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
-                    onChange={ev => setAmount(Number(parseFloat(ev.target.value).toFixed(3)))}
+                    onChange={ev => setAmount(Number(parseFloat(!!ev.target.value ? ev.target.value : "0").toFixed(3)))}
                     type="number"
                     step={0.0001}
                     className={clsx({
@@ -241,7 +249,10 @@ const Swap: React.FC = () => {
               {/* TO DO: Switch */}
               <div className="w-full flex flex-col justify-center items-center relative py-8">
                 <div className="bg-[#2b2b2b] w-full h-[1px]" />
-                <button className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center">
+                <button
+                  onClick={switchTokens}
+                  className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center"
+                >
                   <CgArrowsExchangeV color="#fff" size={28} />
                 </button>
               </div>

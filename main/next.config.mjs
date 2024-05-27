@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (webpackConfig, { webpack }) => {
+  webpack: (webpackConfig, { webpack, dev }) => {
+    if (webpackConfig.cache && !dev) {
+      webpackConfig.cache = Object.freeze({
+        type: "memory"
+      });
+
+      webpackConfig.cache.maxMemoryGenerations = 0;
+    }
+
     webpackConfig.resolve.fallback = {
       fs: false
     };

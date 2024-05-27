@@ -1,19 +1,20 @@
 "use client";
 
 import { RootState } from "@/configs/store";
-import { useAllPools, useFactoryInfo } from "@/hooks/offchain/core";
+import { useAllPools, useFactoryInfo, usePoolPositions } from "@/hooks/offchain/core";
 import { ButtonGroup, ButtonGroupItem } from "@/ui/ButtonGroup";
 import BorderlessArtboard from "@/ui/artboards/BorderlessArtboard";
 import Pools from "@/ui/list/Pools";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { BsPiggyBank } from "react-icons/bs";
 import { FaQuestionCircle } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useChainId } from "wagmi";
+import { type Pair } from "../../../.graphclient";
 
 type POOL_TYPES = "active" | "stable" | "volatile" | "low-tvl" | "incentivized" | "participating" | "all";
 
@@ -22,10 +23,76 @@ const Liquidity: React.FC = () => {
   const tokensState = useSelector((state: RootState) => state.tokens);
   const tokens = useMemo(() => tokensState[chainId], [chainId, tokensState]);
 
+  const [activeList, setActiveList] = useState(0);
+
   const currentPath = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const _activeList = useMemo<POOL_TYPES | null>(() => searchParams.get("list") as POOL_TYPES, [searchParams]);
+  const activeListNumberMap = useMemo<{ [K in POOL_TYPES]: number }>(
+    () => ({
+      active: 0,
+      stable: 1,
+      volatile: 2,
+      incentivized: 3,
+      "low-tvl": 4,
+      participating: 5,
+      all: 6
+    }),
+    []
+  );
+
+  const [searchValue, setSearchValue] = useState("");
 
   const factoryInfo = useFactoryInfo();
+  const accountPositions = usePoolPositions();
   const pools = useAllPools(factoryInfo?.pairCount);
+  const filteredPools = useMemo(() => {
+    let poolsForFilter: Pair[] = [];
+
+    switch (activeList) {
+      case 0:
+        poolsForFilter = pools.filter(p => Number(p.reserve0) > 0 && Number(p.reserve1) > 0);
+        break;
+      case 1:
+        poolsForFilter = pools.filter(p => p.stable);
+        break;
+      case 2:
+        poolsForFilter = pools.filter(p => !p.stable);
+        break;
+      case 3:
+        poolsForFilter = pools.filter(p => Number(p.totalAmount0Claimable) > 0 || Number(p.totalAmount1Claimable) > 0);
+        break;
+      case 4:
+        poolsForFilter = pools.filter(p => Number(p.reserveUSD) < 9999);
+        break;
+      case 5: {
+        const positionsPairs = accountPositions.map(pos => pos.pair.id);
+        poolsForFilter = pools.filter(p => positionsPairs.includes(p.id));
+        break;
+      }
+      case 6:
+        poolsForFilter = pools;
+        break;
+      default:
+        poolsForFilter = pools;
+        break;
+    }
+
+    return poolsForFilter.filter(
+      pool =>
+        pool.id.toLowerCase().startsWith(searchValue.toLowerCase()) ||
+        pool.token0.symbol.toLowerCase().startsWith(searchValue.toLowerCase()) ||
+        pool.token1.symbol.toLowerCase().startsWith(searchValue.toLowerCase())
+    );
+  }, [accountPositions, activeList, pools, searchValue]);
+
+  useEffect(() => {
+    if (_activeList) {
+      setActiveList(activeListNumberMap[_activeList]);
+    }
+  }, [_activeList, activeListNumberMap]);
+
   return (
     <div className="container mx-auto flex flex-col gap-10 px-3 my-12 animate-fade-down animate-once">
       <div className="flex w-full flex-col md:flex-row justify-start md:justify-around items-center gap-10">
@@ -108,7 +175,15 @@ const Liquidity: React.FC = () => {
         <div className="flex flex-col justify-start items-start gap-7 w-full">
           <h3 className="text-[#fff] font-medium text-lg md:text-xl  capitalize">liquidity pools</h3>
           <div className="w-full flex flex-col md:flex-row justify-start md:justify-between items-start md:items-center gap-4 overflow-auto">
-            <ButtonGroup activeButtonIndex={0}>
+            <ButtonGroup
+              activeButtonIndex={activeList}
+              onSingleItemClick={index => {
+                const newActiveList = Object.keys(activeListNumberMap).find(
+                  key => activeListNumberMap[key as POOL_TYPES] === index
+                );
+                router.push(`${currentPath}?list=${newActiveList}`);
+              }}
+            >
               <ButtonGroupItem>
                 <span className="capitalize font-medium text-xs md:text-sm">active</span>
               </ButtonGroupItem>
@@ -135,6 +210,7 @@ const Liquidity: React.FC = () => {
             <div className="flex justify-start items-center gap-1 bg-[#0c0c0b] rounded-[12.8px] border border-[#33332d] px-2 py-2 md:py-3 w-full md:w-1/5">
               <FiSearch color="#fff" size={16} />
               <input
+                onChange={ev => setSearchValue(ev.target.value)}
                 className="bg-transparent border-none outline-none text-[#fff] font-[400] w-full"
                 placeholder="Symbol or address"
               />
@@ -142,7 +218,7 @@ const Liquidity: React.FC = () => {
           </div>
         </div>
       </div>
-      <Pools data={pools} />
+      <Pools data={filteredPools} />
     </div>
   );
 };

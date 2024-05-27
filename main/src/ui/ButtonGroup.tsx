@@ -20,7 +20,7 @@ function ButtonGroupItem({ active, index, children, onClickAction, totalButtonIt
   return (
     <button
       onClick={() => onClickAction && onClickAction(index)}
-      className={clsx("join-item flex justify-center items-center px-2 md:px-4 py-1 md:py-3 text-[#fff]", {
+      className={clsx("join-item flex justify-center items-center px-3 md:px-4 py-3 md:py-3 text-[#fff]", {
         "bg-[#ffb443]": active && !alt,
         "bg-[#0c0c0b]": !active && !alt,
         "bg-[#fc8415]": active && alt,

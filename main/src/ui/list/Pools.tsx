@@ -78,11 +78,15 @@ const SinglePoolItem: React.FC<{ data: Pair }> = ({ data }) => {
             ~${parseFloat(data.volumeUSD).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
           </h3>
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.volumeToken0}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.volumeToken0).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
           </div>
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.volumeToken1}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.volumeToken1).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
           </div>
         </div>
@@ -92,30 +96,180 @@ const SinglePoolItem: React.FC<{ data: Pair }> = ({ data }) => {
             ~${parseFloat(data.feesUSD).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
           </h3>
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.totalAmount0Claimable}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.totalAmount0Claimable).toLocaleString("en-US", {
+                useGrouping: true,
+                maximumFractionDigits: 3
+              })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
           </div>
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.totalAmount1Claimable}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.totalAmount1Claimable).toLocaleString("en-US", {
+                useGrouping: true,
+                maximumFractionDigits: 3
+              })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
           </div>
         </div>
 
         <div className="flex flex-col self-stretch justify-start items-end gap-3">
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.reserve0}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.reserve0).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
           </div>
           <div>
-            <span className="text-[#cfcfcf] font-[400] text-sm">{data.reserve1}</span>{" "}
+            <span className="text-[#cfcfcf] font-[400] text-sm">
+              {parseFloat(data.reserve1).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </span>{" "}
             <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
           </div>
           <Link
-            href={currentPath.concat(`/deposit?token0=${token0?.address}&token1=${token1?.address}`)}
+            href={currentPath.concat(
+              `/deposit?token0=${token0?.address}&token1=${token1?.address}&stable=${Number(data.stable)}`
+            )}
             className="rounded-[12.8px] bg-[#1e1e1e] border border-[#33332d] flex justify-center items-center px-6 py-2 gap-4"
           >
             <BsPiggyBank color="#fff" size={20} />
             <span className="text-[#fff] text-sm md:text-lg capitalize">deposit</span>
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:hidden justify-start start w-full gap-4">
+        <div className="flex justify-start items-center gap-5">
+          <div className="avatar-group -space-x-6 rtl:space-x-reverse">
+            <div className="avatar">
+              <div className="w-8">
+                <img src={token0?.logoURI} alt={token0?.symbol} />
+              </div>
+            </div>
+            <div className="avatar">
+              <div className="w-8">
+                <img src={token1?.logoURI} alt={token1?.symbol} />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col self-stretch justify-start items-start gap-3">
+            <h3 className="font-[500] text-lg text-[#fff]">{symbol}</h3>
+            <div className="flex justify-center items-center gap-1">
+              <span className="text-[#cfcfcf] font-[400] text-sm capitalize">
+                {data.stable ? "stable pool" : "volatile pool"}
+              </span>{" "}
+              <LuDot color="#cfcfcf" /> <span className="text-[#cfcfcf] font-[400] text-sm">{Number(fee) / 100}%</span>{" "}
+              <LuDot color="#cfcfcf" /> <BsExclamationCircle color="#cfcfcf" />
+            </div>
+          </div>
+        </div>
+
+        <div className="h-[1px] w-full bg-[#33332d]" />
+        <div className="flex flex-col justify-start items-start gap-3">
+          <div>
+            <span className="text-[#cfcfcf] font-[400] text-sm uppercase">tvl</span>
+            <span className="text-[#fff] font-[400] text-sm">
+              ~${parseFloat(data.reserveUSD).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </span>
+          </div>
+          <div className="flex justify-start items-center gap-1 w-full">
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm uppercase">apr</span>
+              <span className="text-[#fff] font-[400] text-sm">~0.00%</span>
+            </div>
+
+            <a className="text-sm font-[400] text-[#7d7d7d] underline capitalize">add incentives</a>
+          </div>
+        </div>
+
+        <div className="h-[1px] w-full bg-[#33332d]" />
+
+        <div className="flex flex-col justify-start items-start gap-3">
+          <h4 className="text-sm capitalize text-[#7d7d7d]">volume</h4>
+
+          <div className="flex flex-col self-stretch justify-start items-start gap-3">
+            <h3 className="font-[500] text-sm text-[#cfcfcf]">
+              ~${parseFloat(data.volumeUSD).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </h3>
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.volumeToken0).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
+            </div>
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.volumeToken1).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-[1px] w-full bg-[#33332d]" />
+
+        <div className="flex flex-col justify-start items-start gap-3">
+          <h4 className="text-sm capitalize text-[#7d7d7d]">fees</h4>
+
+          <div className="flex flex-col self-stretch justify-start items-start gap-3">
+            <h3 className="font-[500] text-sm text-[#cfcfcf]">
+              ~${parseFloat(data.feesUSD).toLocaleString("en-US", { useGrouping: true, maximumFractionDigits: 3 })}
+            </h3>
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.totalAmount0Claimable).toLocaleString("en-US", {
+                  useGrouping: true,
+                  maximumFractionDigits: 3
+                })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
+            </div>
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.totalAmount1Claimable).toLocaleString("en-US", {
+                  useGrouping: true,
+                  maximumFractionDigits: 3
+                })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
+            </div>
+          </div>
+        </div>
+        <div className="h-[1px] w-full bg-[#33332d]" />
+        <div className="flex flex-col justify-start items-start gap-3">
+          <h4 className="text-sm capitalize text-[#7d7d7d]">pool balance</h4>
+
+          <div className="flex flex-col self-stretch justify-start items-start gap-3">
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.reserve0).toLocaleString("en-US", {
+                  useGrouping: true,
+                  maximumFractionDigits: 3
+                })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token0.symbol}</span>
+            </div>
+            <div>
+              <span className="text-[#cfcfcf] font-[400] text-sm">
+                {parseFloat(data.reserve1).toLocaleString("en-US", {
+                  useGrouping: true,
+                  maximumFractionDigits: 3
+                })}
+              </span>{" "}
+              <span className="text-[#7d7d7d] font-[400] text-sm">{data.token1.symbol}</span>
+            </div>
+          </div>
+
+          <Link
+            href={currentPath.concat(
+              `/deposit?token0=${token0?.address}&token1=${token1?.address}&stable=${Number(data.stable)}`
+            )}
+            className="rounded-[12.8px] bg-[#1e1e1e] border border-[#33332d] flex justify-center items-center px-4 py-1 gap-2"
+          >
+            <BsPiggyBank color="#fff" size={16} />
+            <span className="text-[#fff] text-sm capitalize">deposit</span>
           </Link>
         </div>
       </div>
@@ -140,7 +294,7 @@ const Pools: React.FC<PoolsViewProps> = ({ data }) => (
           <div
             key={index}
             className={clsx("w-full", {
-              "border-b border-[#000]": index < data.length - 1
+              "border-b border-[#000] py-2": index < data.length - 1
             })}
           >
             <SinglePoolItem data={pair} />

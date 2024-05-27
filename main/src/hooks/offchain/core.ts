@@ -1,6 +1,6 @@
 import { __GRAPH_CHAIN_NAMES__, __POOL_FACTORIES__ } from "@/constants";
 import { useEffect, useMemo, useState } from "react";
-import { useChainId } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import {
   IndexPoolFactoryInfoDocument,
   type PoolFactory,
@@ -8,7 +8,9 @@ import {
   type Pair,
   IndexSinglePairDocument,
   IndexManyPoolsUsingIDsDocument,
-  IndexAllPoolsDocument
+  IndexAllPoolsDocument,
+  IndexAccountPositionsDocument,
+  type AccountPosition
 } from "../../../.graphclient";
 
 export function useFactoryInfo() {
@@ -65,4 +67,19 @@ export function useAllPools(first: number = 6000) {
   }, [first]);
 
   return pools;
+}
+
+export function usePoolPositions() {
+  const [positions, setPositions] = useState<AccountPosition[]>([]);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    if (address) {
+      execute(IndexAccountPositionsDocument, { account: address })
+        .then(({ data }) => setPositions(data.accountPositions))
+        .catch(console.debug);
+    }
+  }, [address]);
+
+  return positions;
 }

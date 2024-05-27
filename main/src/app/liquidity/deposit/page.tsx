@@ -17,7 +17,7 @@ import { useAccount, useChainId, useWatchBlocks } from "wagmi";
 import clsx from "clsx";
 import { IoIosSwap } from "react-icons/io";
 import { div, mul } from "@/helpers/math";
-import { __ADDRESS_0__, __AGGREGATOR_ROUTERS__, __CHAIN_INFO__, __ETHER__, __WRAPPED_ETHER__ } from "@/constants";
+import { __ADDRESS_0__, __CHAIN_INFO__, __ETHER__, __PROTOCOL_ROUTERS__, __WRAPPED_ETHER__ } from "@/constants";
 import { FaLock, FaUnlockKeyhole } from "react-icons/fa6";
 import { PiConfetti } from "react-icons/pi";
 import { usePoolMetadata, useProtocolCore } from "@/hooks/onchain/core";
@@ -25,6 +25,7 @@ import { ButtonGroup, ButtonGroupItem } from "@/ui/ButtonGroup";
 import { useSinglePoolInfo } from "@/hooks/offchain/core";
 import { BsExclamationCircle } from "react-icons/bs";
 import { LuDot } from "react-icons/lu";
+import { useSearchParams } from "next/navigation";
 
 const Deposit: React.FC = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const Deposit: React.FC = () => {
   const wrappedEther = useMemo(() => __WRAPPED_ETHER__[chainId], [chainId]);
 
   // Router
-  const router = useMemo(() => __AGGREGATOR_ROUTERS__[chainId], [chainId]);
+  const router = useMemo(() => __PROTOCOL_ROUTERS__[chainId], [chainId]);
 
   // Token addresses
   const address0 = useMemo(
@@ -171,6 +172,37 @@ const Deposit: React.FC = () => {
 
   // Off-chain indexing
   const indexedPool = useSinglePoolInfo(poolAddress?.toLowerCase());
+
+  const switchTokens = useCallback(() => {
+    const t0 = tknStateData.firstSelectedToken;
+    const t1 = tknStateData.secondSelectedToken;
+
+    dispatch(setFirstSelectedToken({ chainId, address: t1 }));
+    dispatch(setSecondSelectedToken({ chainId, address: t0 }));
+  }, [chainId, dispatch, tknStateData.firstSelectedToken, tknStateData.secondSelectedToken]);
+
+  const searchParams = useSearchParams();
+  const queryToken0 = useMemo(() => searchParams.get("token0"), [searchParams]);
+  const queryToken1 = useMemo(() => searchParams.get("token1"), [searchParams]);
+  const queryStable = useMemo(() => searchParams.get("stable"), [searchParams]);
+
+  useEffect(() => {
+    if (queryToken0) {
+      const t = tknStateData.tokenlist.find(t => t.address.toLowerCase() === queryToken0.toLowerCase());
+
+      if (t) dispatch(setFirstSelectedToken({ chainId, address: t.address }));
+    }
+
+    if (queryToken1) {
+      const t = tknStateData.tokenlist.find(t => t.address.toLowerCase() === queryToken1.toLowerCase());
+
+      if (t) dispatch(setFirstSelectedToken({ chainId, address: t.address }));
+    }
+
+    if (queryStable) {
+      setStable(Number(queryStable));
+    }
+  }, [chainId, dispatch, queryStable, queryToken0, queryToken1, tknStateData.tokenlist]);
 
   useWatchBlocks({
     onBlock: async () => {
@@ -299,7 +331,10 @@ const Deposit: React.FC = () => {
               {/* TO DO: Switch */}
               <div className="w-full flex flex-col justify-center items-center relative py-8">
                 <div className="bg-[#2b2b2b] w-full h-[1px]" />
-                <button className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center">
+                <button
+                  onClick={switchTokens}
+                  className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center"
+                >
                   <CgArrowsExchangeV color="#fff" size={28} />
                 </button>
               </div>
