@@ -1,6 +1,6 @@
 import { createClient } from "viem";
 import { http, createConfig } from "wagmi";
-import { berachainTestnet, bscTestnet, mainnet } from "wagmi/chains";
+import { bscTestnet, mainnet } from "wagmi/chains";
 import { walletConnect, injected, coinbaseWallet, safe } from "wagmi/connectors";
 
 const isValidUrl = (urlString: string) => {
@@ -13,7 +13,7 @@ const isValidUrl = (urlString: string) => {
 
 export const config = (rpc: any) =>
   createConfig({
-    chains: process.env.NETWORK === "mainnet" ? [mainnet] : [bscTestnet, berachainTestnet],
+    chains: process.env.NETWORK === "mainnet" ? [mainnet] : [bscTestnet],
     multiInjectedProviderDiscovery: false,
     connectors: [
       injected({ target: "metaMask" }),

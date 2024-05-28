@@ -1,3 +1,6 @@
+import runtimeCaching from "next-pwa/cache.js";
+import pwa from "next-pwa";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (webpackConfig, { webpack, dev }) => {
@@ -31,4 +34,12 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+const withPWA = pwa({
+  dest: "public",
+  skipWaiting: true,
+  register: true,
+  disable: process.env.NODE_ENV !== "production",
+  runtimeCaching
+});
+
+export default withPWA(nextConfig);

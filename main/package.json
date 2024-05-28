@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
-    "build": "next build",
+    "build": "cross-env NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "graph:build": "graphclient build"
@@ -14,9 +14,11 @@
     "@tanstack/react-query": "^5.37.1",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "daisyui": "^4.11.1",
     "encoding": "^0.1.13",
     "next": "^14.2.3",
+    "next-pwa": "^5.6.0",
     "pino-pretty": "^11.1.0",
     "react": "^18",
     "react-dom": "^18",
