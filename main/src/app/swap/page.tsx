@@ -3,12 +3,12 @@
 import { RootState } from "@/configs/store";
 import { setFirstSelectedToken, setSecondSelectedToken } from "@/configs/store/slices/tokensSlice";
 import { useAdapter, useAggregatorRouter } from "@/hooks/onchain/swap";
-import { useERC20Allowance, useERC20Balance } from "@/hooks/onchain/wallet";
+import { useERC20Allowance, useERC20Balance, useNativeBalance } from "@/hooks/onchain/wallet";
 import { Step, StepGroup } from "@/ui/Step";
 import BorderlessArtboard from "@/ui/artboards/BorderlessArtboard";
 import TokenlistModal from "@/ui/modals/TokenlistModal";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CgArrowsExchangeV } from "react-icons/cg";
 import { FiChevronDown, FiExternalLink, FiPlusSquare } from "react-icons/fi";
 import { MdKeyboardDoubleArrowRight, MdOutlineCalculate, MdOutlineError } from "react-icons/md";
@@ -17,7 +17,7 @@ import { useAccount, useChainId, useWatchBlocks } from "wagmi";
 import clsx from "clsx";
 import { IoIosSwap } from "react-icons/io";
 import { div, mul, sub } from "@/helpers/math";
-import { __AGGREGATOR_ROUTERS__, __CHAIN_INFO__ } from "@/constants";
+import { __AGGREGATOR_ROUTERS__, __CHAIN_INFO__, __ETHER__, __WRAPPED_ETHER__ } from "@/constants";
 import { FaLock, FaUnlockKeyhole } from "react-icons/fa6";
 import { PiConfetti } from "react-icons/pi";
 
@@ -48,7 +48,7 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
     <div className="w-full flex flex-col items-start justify-start gap-5">
       <h3 className="capitalize font-[400] text-sm md:text-lg text-[#cfcfcf]">liquidity routing</h3>
       <div className="h-[1px] w-full bg-[#2b2b2b]" />
-      <div className="w-full relative flex justify-center items-center -mt-3">
+      <div className="w-full relative flex justify-center items-center -mt-3 overflow-x-auto">
         <div className="border-b border-dashed h-[1px] w-full bg-[#9a9888] absolute top-[50%]" />
         <ul className="flex justify-between items-center w-full z-[100]">
           {tokens.map((token, index) => (
@@ -77,7 +77,7 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
   );
 };
 
-function Swap() {
+const Swap: React.FC = () => {
   const dispatch = useDispatch();
   const tokenlistModal0 = useRef<HTMLInputElement>(null);
   const tokenlistModal1 = useRef<HTMLInputElement>(null);
@@ -98,12 +98,33 @@ function Swap() {
   const [amount, setAmount] = useState(0);
   const [activeStep, setActiveStep] = useState(-1);
 
+  // Wrapped ETHER
+  const wrappedEther = useMemo(() => __WRAPPED_ETHER__[chainId], [chainId]);
+
   // Router
   const router = useMemo(() => __AGGREGATOR_ROUTERS__[chainId], [chainId]);
 
-  // Balances
-  const { balance: token0Balance } = useERC20Balance(tknStateData.firstSelectedToken as any);
-  const { balance: token1Balance } = useERC20Balance(tknStateData.secondSelectedToken as any);
+  // Token addresses
+  const address0 = useMemo(
+    () => (tknStateData.firstSelectedToken === __ETHER__ ? wrappedEther : tknStateData.firstSelectedToken),
+    [tknStateData.firstSelectedToken, wrappedEther]
+  );
+  const address1 = useMemo(
+    () => (tknStateData.secondSelectedToken === __ETHER__ ? wrappedEther : tknStateData.secondSelectedToken),
+    [tknStateData.secondSelectedToken, wrappedEther]
+  );
+
+  const { balance: etherBalance } = useNativeBalance();
+  const { balance: token0Balance } = useERC20Balance(address0 as any);
+  const { balance: token1Balance } = useERC20Balance(address1 as any);
+  const balance0 = useMemo(
+    () => (tknStateData.firstSelectedToken === __ETHER__ ? etherBalance : token0Balance),
+    [etherBalance, tknStateData.firstSelectedToken, token0Balance]
+  );
+  const balance1 = useMemo(
+    () => (tknStateData.secondSelectedToken === __ETHER__ ? etherBalance : token1Balance),
+    [etherBalance, tknStateData.secondSelectedToken, token1Balance]
+  );
 
   // Wallet settings
   const slippage = useSelector((state: RootState) => state.wallet.slippageTolerance);
@@ -115,26 +136,17 @@ function Swap() {
     isFetching: bestQueryFetching,
     isError: bestQueryError,
     refetch: refetchBestQuery
-  } = useBestQuery(
-    tknStateData.firstSelectedToken as any,
-    tknStateData.secondSelectedToken as any,
-    amount * Math.pow(10, token0?.decimals ?? 18)
-  );
+  } = useBestQuery(address0 as any, address1 as any, amount * Math.pow(10, token0?.decimals ?? 18));
   const amountOutFormatted = useMemo(
     () => div(Number(bestQueryData?.amountOut ?? 0), Math.pow(10, token1?.decimals ?? 18)),
     [bestQueryData?.amountOut, token1?.decimals]
   );
+
   const {
     data: bestPathData,
     isFetching: bestPathFetching,
-    isError: bestPathError,
     refetch: refetchBestPath
-  } = useFindBestPath(
-    amount * Math.pow(10, token0?.decimals ?? 18),
-    tknStateData.firstSelectedToken as any,
-    tknStateData.secondSelectedToken as any,
-    3
-  );
+  } = useFindBestPath(amount * Math.pow(10, token0?.decimals ?? 18), address0 as any, address1 as any);
   const {
     executeSwap,
     isError: swapError,
@@ -143,9 +155,12 @@ function Swap() {
     hash: swapHash,
     reset: resetSwap
   } = useSwap({
-    amountIn: BigInt(mul(amount, Math.pow(10, token0?.decimals ?? 18))),
+    amountIn: BigInt(mul(Number(amount.toFixed(3)), Math.pow(10, token0?.decimals ?? 18))),
     amountOut: BigInt(
-      mul(sub(amountOutFormatted, mul(slippage / 100, amountOutFormatted)), Math.pow(10, token1?.decimals ?? 18))
+      mul(
+        sub(parseFloat(amountOutFormatted.toFixed(3)), mul(slippage / 100, parseFloat(amountOutFormatted.toFixed(2)))),
+        Math.pow(10, token1?.decimals ?? 18)
+      )
     ),
     path: bestPathData?.path ?? [],
     adapters: bestPathData?.adapters ?? []
@@ -153,7 +168,7 @@ function Swap() {
   const txUrl = useMemo(() => __CHAIN_INFO__[chainId].explorer.concat(`/tx/${swapHash}`), [chainId, swapHash]);
 
   // Wallet-relevant on-chain functions
-  const { useAllowance, useApproval } = useERC20Allowance(tknStateData.firstSelectedToken as any);
+  const { useAllowance, useApproval } = useERC20Allowance(address0 as any);
   const {
     data: allowance,
     isFetching: allowanceFetching,
@@ -164,12 +179,18 @@ function Swap() {
     () => div(Number(allowance ?? 0), Math.pow(10, token0?.decimals ?? 18)),
     [allowance, token0?.decimals]
   );
-  const {
-    executeApproval,
-    isError: approvalError,
-    isPending: approvalPending,
-    isSuccess: approvalSuccess
-  } = useApproval(router as any, mul(amount, Math.pow(10, token0?.decimals ?? 18)));
+  const { executeApproval, isPending: approvalPending } = useApproval(
+    router as any,
+    mul(amount, Math.pow(10, token0?.decimals ?? 18))
+  );
+
+  const switchTokens = useCallback(() => {
+    const t0 = tknStateData.firstSelectedToken;
+    const t1 = tknStateData.secondSelectedToken;
+
+    dispatch(setFirstSelectedToken({ chainId, address: t1 }));
+    dispatch(setSecondSelectedToken({ chainId, address: t0 }));
+  }, [chainId, dispatch, tknStateData.firstSelectedToken, tknStateData.secondSelectedToken]);
 
   useWatchBlocks({
     onBlock: async () => {
@@ -191,7 +212,7 @@ function Swap() {
 
   return (
     <>
-      <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40">
+      <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40 animate-fade-down animate-once">
         <div className="w-full md:w-1/3 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
             <div className="flex flex-col justify-start items-center w-full gap-6 pt-4 pb-16 relative">
@@ -199,7 +220,7 @@ function Swap() {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">swap</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {token0Balance.toPrecision(4)} {token0?.symbol}
+                    available {balance0.toPrecision(4)} {token0?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -214,12 +235,13 @@ function Swap() {
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
-                    onChange={ev => setAmount(Number(ev.target.value))}
+                    onChange={ev => setAmount(Number(parseFloat(!!ev.target.value ? ev.target.value : "0").toFixed(3)))}
                     type="number"
+                    step={0.0001}
                     className={clsx({
                       "justify-center join-item items-start px-2.5  rounded-xl border-l border-[#2b2b2b] bg-transparent text-[#fff] font-[500] text-sm md:text-lg w-full outline-none":
                         true,
-                      "border-t border-r border-b border-y-[#ffb443] border-r-[#ffb443]": amount > token0Balance
+                      "border-t border-r border-b border-y-[#ffb443] border-r-[#ffb443]": amount > balance0
                     })}
                   />
                 </div>
@@ -227,7 +249,10 @@ function Swap() {
               {/* TO DO: Switch */}
               <div className="w-full flex flex-col justify-center items-center relative py-8">
                 <div className="bg-[#2b2b2b] w-full h-[1px]" />
-                <button className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center">
+                <button
+                  onClick={switchTokens}
+                  className="btn btn-ghost btn-sm md:btn-md btn-square rounded-[10px] relative -top-3 md:-top-6 bg-[#47473f] flex justify-center items-center"
+                >
                   <CgArrowsExchangeV color="#fff" size={28} />
                 </button>
               </div>
@@ -235,7 +260,7 @@ function Swap() {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className=" text-[#fff] font-[500] capitalize text-sm md:text-lg">for</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {token1Balance.toPrecision(4)} {token1?.symbol}
+                    available {balance1.toPrecision(4)} {token1?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -271,7 +296,7 @@ function Swap() {
         </div>
         <div className="w-full md:w-1/4 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
-            <div className="flex flex-col justify-start items-center w-full gap-10">
+            <div className="flex flex-col justify-start items-center w-full gap-10 pb-16">
               <div className="flex justify-between items-center gap-3 w-full">
                 <h4 className=" text-[#fff] font-[500] capitalize text-lg md:text-xl">swap</h4>
                 <Image src="/images/hive.svg" width={60} height={60} alt="hive" />
@@ -359,7 +384,7 @@ function Swap() {
                     </>
                   }
                 />
-                {amount > 0 && (
+                {amount > 0 && tknStateData.firstSelectedToken !== __ETHER__ && (
                   <Step
                     customIcon={
                       allowanceFetching ? (
@@ -388,7 +413,11 @@ function Swap() {
                                   Allowance too low for {token0?.symbol}
                                 </span>
                                 <button
-                                  disabled={allowedToSpend >= amount || !isConnected}
+                                  disabled={
+                                    allowedToSpend >= amount ||
+                                    !isConnected ||
+                                    tknStateData.firstSelectedToken === __ETHER__
+                                  }
                                   onClick={executeApproval}
                                   className="bg-[#1e1e1e] border border-[#2b2b2b] capitalize px-4 py-3 flex justify-center items-center rounded-[12.8px] gap-2"
                                 >
@@ -436,7 +465,7 @@ function Swap() {
                           }}
                           className="flex justify-center items-center cursor-pointer"
                         >
-                          <span className="text-[#cfcfcf] text-sm underline">Reset</span>
+                          <span className="text-[#cfcfcf] text-sm underline capitalize">reset</span>
                         </a>
                       </div>
                     }
@@ -470,7 +499,7 @@ function Swap() {
                 </span>
               </li>
             </ul> */}
-              {allowedToSpend >= amount && amount > 0 && (
+              {(allowedToSpend >= amount || tknStateData.firstSelectedToken === __ETHER__) && amount > 0 && (
                 <button
                   disabled={swapPending || !isConnected}
                   onClick={executeSwap}
@@ -500,6 +529,6 @@ function Swap() {
       />
     </>
   );
-}
+};
 
 export default Swap;

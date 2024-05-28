@@ -3,19 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "build": "cross-env NODE_ENV=production next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "graph:build": "graphclient build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
     "@tanstack/react-query": "^5.37.1",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "daisyui": "^4.11.1",
     "encoding": "^0.1.13",
-    "next": "14.2.3",
+    "next": "^14.2.3",
+    "next-pwa": "^5.6.0",
     "pino-pretty": "^11.1.0",
     "react": "^18",
     "react-dom": "^18",
@@ -27,14 +30,18 @@
     "wagmi": "^2.9.3"
   },
   "devDependencies": {
+    "@graphprotocol/client-cli": "^3.0.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/redux-persist": "^4.3.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "graphql": "^16.8.1",
+    "long": "^5.2.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "uglify-es": "^3.3.9"
   }
 }

@@ -30,5 +30,37 @@
     "chainId": 97,
     "decimals": 18,
     "logoURI": "https://pbs.twimg.com/profile_images/1746472536487985152/XNAWDMik_400x400.jpg"
+  },
+  {
+    "name": "Binance Smartchain",
+    "symbol": "tBNB",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "chainId": 97,
+    "decimals": 18,
+    "logoURI": "https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png"
+  },
+  {
+    "name": "DAI Stablecoin",
+    "symbol": "DAI",
+    "address": "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867",
+    "chainId": 97,
+    "decimals": 18,
+    "logoURI": "https://tokens.pancakeswap.finance/images/eth/0x6B175474E89094C44Da98b954EedeAC495271d0F.png"
+  },
+  {
+    "name": "Doge 2",
+    "symbol": "DOGE2",
+    "address": "0x4FF0fbcF0EAf3aD57779562F11969A070B013294",
+    "chainId": 97,
+    "decimals": 9,
+    "logoURI": "https://assets.coingecko.com/coins/images/17190/thumb/Golden-Doge-Logo-200x200-White-Background.png?1696516748"
+  },
+  {
+    "name": "vBitcoin",
+    "symbol": "VBTC",
+    "address": "0x9a3a82e99130d0ec1Bb3Be2422090B80C80b192a",
+    "chainId": 97,
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/11370/thumb/Bitcoin.jpg?1696511287"
   }
 ]
