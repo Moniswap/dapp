@@ -424,7 +424,7 @@ const Deposit: React.FC = () => {
         </div>
         <div className="w-full md:w-1/4 self-stretch">
           <BorderlessArtboard width="100%" height="100%">
-            <div className="flex flex-col justify-start items-center w-full gap-10">
+            <div className="flex flex-col justify-start items-center w-full gap-10 pb-16">
               <div className="flex justify-between items-center gap-3 w-full">
                 <h4 className=" text-[#fff] font-[500] capitalize text-lg md:text-xl">new deposit</h4>
                 <Image src="/images/hive.svg" width={60} height={60} alt="hive" />
@@ -508,7 +508,7 @@ const Deposit: React.FC = () => {
                   <Step
                     content={
                       <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                        Confirm, and deposit the liquidity.
+                        Confirm, and deposit liquidity
                       </span>
                     }
                   />
