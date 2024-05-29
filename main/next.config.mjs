@@ -8,8 +8,6 @@ const nextConfig = {
       webpackConfig.cache = Object.freeze({
         type: "memory"
       });
-
-      webpackConfig.cache.maxMemoryGenerations = 0;
     }
 
     webpackConfig.resolve.fallback = {
