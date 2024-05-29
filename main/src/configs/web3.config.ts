@@ -1,15 +1,8 @@
+import { isValidUrl } from "@/helpers/utils";
 import { createClient } from "viem";
 import { http, createConfig } from "wagmi";
 import { bscTestnet, mainnet } from "wagmi/chains";
 import { walletConnect, injected, coinbaseWallet, safe } from "wagmi/connectors";
-
-const isValidUrl = (urlString: string) => {
-  try {
-    return Boolean(new URL(urlString));
-  } catch (e) {
-    return false;
-  }
-};
 
 export const config = (rpc: any) =>
   createConfig({
