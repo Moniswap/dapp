@@ -313,7 +313,7 @@ const Swap: React.FC = () => {
                       ) : (
                         <>
                           {bestQueryFetching ? (
-                            <div className="flex justify-center gap-1 items-center w-full">
+                            <div className="flex justify-start gap-1 items-center w-full">
                               <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
                                 Searching for ideal rate...
                               </span>
