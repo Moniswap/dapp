@@ -18,10 +18,19 @@ services:
     build:
       context: ./main
       dockerfile: Dockerfile
-    ports:
-      - 5447:5447
     environment:
       - NETWORK=testnet
+  proxy:
+    container_name: testnet-moniswap-proxy
+    networks:
+      - testnet-dapp
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5447:80
 networks:
   testnet-dapp:
     external: false

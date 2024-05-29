@@ -1,0 +1,14 @@
+client_max_body_size 800M;
+resolver             127.0.0.11;
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://client:5447/;
+  }
+
+  location /api/ {
+    proxy_pass http:server:8811/
+  }
+}
