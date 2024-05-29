@@ -251,15 +251,19 @@ function Header() {
               <ActiveFloatingLink href="/swap">
                 <span className="capitalize">swap</span>
               </ActiveFloatingLink>
-              <ActiveFloatingLink href="/dashboard">
-                <span className="capitalize">dashboard</span>
-              </ActiveFloatingLink>
+              {isConnected && (
+                <ActiveFloatingLink href="/dashboard">
+                  <span className="capitalize">dashboard</span>
+                </ActiveFloatingLink>
+              )}
               <ActiveFloatingLink href="/liquidity">
                 <span className="capitalize">liquidity</span>
               </ActiveFloatingLink>
-              <ActiveFloatingLink href="#">
-                <span className="capitalize">vote</span>
-              </ActiveFloatingLink>
+              {isConnected && (
+                <ActiveFloatingLink href="#">
+                  <span className="capitalize">vote</span>
+                </ActiveFloatingLink>
+              )}
             </div>
           </div>
         )}

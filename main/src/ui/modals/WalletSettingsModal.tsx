@@ -1,9 +1,9 @@
 /* eslint-disable react/display-name */
 import * as React from "react";
 import { forwardRef } from "react";
-import { useAccount, useBalance, useDisconnect, useChainId } from "wagmi";
+import { useAccount, useDisconnect, useChainId } from "wagmi";
 import { FiX } from "react-icons/fi";
-import { customEllipsize } from "@/helpers/utils";
+import { customEllipsize, isValidUrl } from "@/helpers/utils";
 import { BiCopy, BiWallet } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/configs/store";
@@ -13,6 +13,8 @@ import {
   changeRPCNodeUrl,
   changeSlippageTolerance
 } from "@/configs/store/slices/walletSettingsSlice";
+import { useNativeBalance } from "@/hooks/onchain/wallet";
+import { __CHAIN_INFO__ } from "@/constants";
 
 interface ModalProps {
   close?: () => any;
@@ -23,17 +25,34 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
   const { disconnect } = useDisconnect();
   const chainId = useChainId();
   const dispatch = useDispatch();
-  const { data: balanceData } = useBalance({
-    address
-  });
+  const { balance } = useNativeBalance();
   const { slippageTolerance, rpcNode, allowUnsafeTrades, executionDeadlineInMinutes } = useSelector(
     (state: RootState) => state.wallet
   );
   const slippageToleranceOptions = [0.01, 0.1, 0.5, 1, 5];
 
+  // RPC node
+  const [newRPC, setNewRPC] = React.useState(rpcNode[chainId].url);
+
+  React.useEffect(() => {
+    if (rpcNode[chainId] && rpcNode[chainId].url) {
+      setNewRPC(rpcNode[chainId].url);
+    }
+  }, [chainId, rpcNode]);
+
   return (
     <>
-      <input type="checkbox" className="modal-toggle" id="wallet-settings-modal" ref={ref} />
+      <input
+        onChange={ev => {
+          if (!ev.target.checked && isValidUrl(newRPC)) {
+            dispatch(changeRPCNodeUrl({ chainId, value: newRPC }));
+          }
+        }}
+        type="checkbox"
+        className="modal-toggle"
+        id="wallet-settings-modal"
+        ref={ref}
+      />
       <div className="modal" role="dialog">
         <div className="bg-[#111] rounded-[5px] modal-box p-3 flex flex-col justify-start items-center gap-7 overflow-visible">
           <section className="flex flex-col pb-14 w-full rounded-xl bg-[#111] max-md:max-w-full z-20">
@@ -62,7 +81,7 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
                     </div>
                   </div>
                   <div className=" text-zinc-500 max-md:max-w-full">
-                    Balance: {`${balanceData?.formatted} ${balanceData?.symbol}`}
+                    Balance: {`${balance.toFixed(4)} ${__CHAIN_INFO__[chainId].symbol}`}
                   </div>
                 </div>
               </div>
@@ -79,8 +98,8 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
                     type="text"
                     className="justify-center items-start px-2.5 py-4 mt-5 rounded-xl border border-solid bg-[#1E1E1E] border-stone-700 text-zinc-500 max-md:pr-5 max-md:max-w-full"
                     placeholder="RPC URL......."
-                    value={rpcNode[chainId].url}
-                    onChange={ev => dispatch(changeRPCNodeUrl({ chainId, value: ev.target.value }))}
+                    value={newRPC}
+                    onChange={ev => setNewRPC(ev.target.value)}
                   />
                   <div className="mt-6  max-md:max-w-full">
                     Leave blank if you want to use the RPC provided by us.
@@ -117,7 +136,9 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
                     className="justify-center items-start px-2.5 py-4 mt-5  rounded-xl border border-solid bg-[#1E1E1E] border-stone-700 text-zinc-500 max-md:pr-5 max-md:max-w-full"
                     placeholder="Custom slippage......."
                     value={slippageTolerance}
-                    onChange={ev => dispatch(changeSlippageTolerance(ev.target.valueAsNumber ?? 0.01))}
+                    onChange={ev =>
+                      dispatch(changeSlippageTolerance(isNaN(ev.target.valueAsNumber) ? 0.01 : ev.target.valueAsNumber))
+                    }
                   />
                 </div>
               </div>
