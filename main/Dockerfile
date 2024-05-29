@@ -4,6 +4,7 @@ COPY src /src/
 COPY public /public/
 COPY .env /
 COPY *.json /
+COPY tailwind.config.ts /
 COPY *.mjs /
 COPY .graphclientrc.yml /
 RUN yarn
