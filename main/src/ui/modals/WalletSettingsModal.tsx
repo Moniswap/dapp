@@ -117,7 +117,7 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
                     className="justify-center items-start px-2.5 py-4 mt-5  rounded-xl border border-solid bg-[#1E1E1E] border-stone-700 text-zinc-500 max-md:pr-5 max-md:max-w-full"
                     placeholder="Custom slippage......."
                     value={slippageTolerance}
-                    onChange={ev => dispatch(changeSlippageTolerance(ev.target.valueAsNumber))}
+                    onChange={ev => dispatch(changeSlippageTolerance(ev.target.valueAsNumber ?? 0.01))}
                   />
                 </div>
               </div>

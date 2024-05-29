@@ -153,7 +153,8 @@ const Swap: React.FC = () => {
     isPending: swapPending,
     isSuccess: swapSuccess,
     hash: swapHash,
-    reset: resetSwap
+    reset: resetSwap,
+    error: txError
   } = useSwap({
     amountIn: BigInt(mul(Number(amount.toFixed(3)), Math.pow(10, token0?.decimals ?? 18))),
     amountOut: BigInt(
@@ -220,7 +221,7 @@ const Swap: React.FC = () => {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">swap</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {balance0.toPrecision(4)} {token0?.symbol}
+                    available {balance0.toFixed(4)} {token0?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -260,7 +261,7 @@ const Swap: React.FC = () => {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className=" text-[#fff] font-[500] capitalize text-sm md:text-lg">for</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {balance1.toPrecision(4)} {token1?.symbol}
+                    available {balance1.toFixed(4)} {token1?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -374,7 +375,7 @@ const Swap: React.FC = () => {
                       {activeStep >= 2 && bestQueryData ? (
                         <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
                           Minimum received:
-                          {amountOutFormatted.toPrecision(4)} {token1?.symbol}
+                          {amountOutFormatted.toFixed(4)} {token1?.symbol}
                         </span>
                       ) : (
                         <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
@@ -476,7 +477,7 @@ const Swap: React.FC = () => {
                     customIcon={<MdOutlineError color="#800020" />}
                     content={
                       <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                        Error occured while swapping
+                        Error occured while swapping: {txError?.message}
                       </span>
                     }
                   />
