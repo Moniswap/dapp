@@ -477,7 +477,7 @@ const Swap: React.FC = () => {
                     customIcon={<MdOutlineError color="#800020" />}
                     content={
                       <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                        Error occured while swapping: {txError?.message}
+                        Error occured while swapping
                       </span>
                     }
                   />
