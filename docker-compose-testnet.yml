@@ -8,7 +8,7 @@ services:
       - host.docker.internal:host-gateway
     build:
       context: ./server
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
   client:
     container_name: testnet-moniswap-client
     networks:
