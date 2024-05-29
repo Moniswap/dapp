@@ -452,13 +452,13 @@ const Deposit: React.FC = () => {
                               {quote && quote[1] > 0 && !quoteError ? (
                                 <div className="flex flex-col justify-start items-start gap-2">
                                   <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">Quote found</span>
-                                  <div className="flex justify-center items-center w-full gap-2">
+                                  <div className="flex justify-start items-center w-full gap-2">
                                     <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
-                                      {amount0In} {token0?.symbol}
+                                      {amount0In.toFixed(3)} {token0?.symbol}
                                     </span>
                                     <IoIosSwap color="#cfcfcf" size={20} />
                                     <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
-                                      {div(Number(quote[1]), Math.pow(10, token1?.decimals ?? 18)).toPrecision(4)}{" "}
+                                      {div(Number(quote[1]), Math.pow(10, token1?.decimals ?? 18)).toFixed(3)}{" "}
                                       {token1?.symbol}
                                     </span>
                                   </div>

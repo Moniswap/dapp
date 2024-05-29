@@ -329,13 +329,13 @@ const Swap: React.FC = () => {
                                   <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
                                     Best exchange rate found
                                   </span>
-                                  <div className="flex justify-center items-center w-full gap-2">
+                                  <div className="flex justify-start items-center w-full gap-2">
                                     <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
                                       1 {token0?.symbol}
                                     </span>
                                     <IoIosSwap color="#cfcfcf" size={20} />
                                     <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
-                                      {(amountOutFormatted / amount).toPrecision(4)} {token1?.symbol}
+                                      {(amountOutFormatted / amount).toFixed(3)} {token1?.symbol}
                                     </span>
                                   </div>
                                 </div>
