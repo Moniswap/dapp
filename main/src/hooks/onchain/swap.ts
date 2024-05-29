@@ -58,7 +58,7 @@ export function useAggregatorRouter() {
           account: address,
           value: trade.path[0].toLowerCase() === __WRAPPED_ETHER__[chainId].toLowerCase() ? trade.amountIn : BigInt(0)
         },
-        { onSuccess, onError: err => console.error(err.stack) }
+        { onSuccess, onError: err => console.error(err) }
       );
 
     return { executeSwap, isError, isSuccess, isPending, hash, reset, error };
