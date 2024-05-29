@@ -299,26 +299,26 @@ const Deposit: React.FC = () => {
                   <h3 className="text-[#7d7d7d] font-[400] text-sm capitalize">liquidity</h3>
                   <span className="text-[#cfcfcf] text-lg">
                     {indexedPool
-                      ? `${Number(indexedPool.reserve0).toPrecision(3)} ${indexedPool.token0.symbol}`
+                      ? `${Number(indexedPool.reserve0).toFixed(3)} ${indexedPool.token0.symbol}`
                       : `0.00 ${token0?.symbol}`}
                   </span>
                   <span className="text-[#cfcfcf] text-lg">
                     {indexedPool
-                      ? `${Number(indexedPool.reserve1).toPrecision(3)} ${indexedPool.token1.symbol}`
+                      ? `${Number(indexedPool.reserve1).toFixed(3)} ${indexedPool.token1.symbol}`
                       : `0.00 ${token1?.symbol}`}
                   </span>
                 </div>
 
                 <div className="flex flex-col justify-start items-end gap-2">
-                  <h3 className="text-[#7d7d7d] font-[400] text-sm capitalize">your positiom</h3>
+                  <h3 className="text-[#7d7d7d] font-[400] text-sm capitalize">your position</h3>
                   <span className="text-[#cfcfcf] text-lg">
                     {indexedPool
-                      ? `${token0Deposited.toPrecision(3)} ${indexedPool.token0.symbol}`
+                      ? `${token0Deposited.toFixed(3)} ${indexedPool.token0.symbol}`
                       : `0.00 ${token0?.symbol}`}
                   </span>
                   <span className="text-[#cfcfcf] text-lg">
                     {indexedPool
-                      ? `${token1Deposited.toPrecision(3)} ${indexedPool.token1.symbol}`
+                      ? `${token1Deposited.toFixed(3)} ${indexedPool.token1.symbol}`
                       : `0.00 ${token1?.symbol}`}
                   </span>
                 </div>
@@ -327,7 +327,7 @@ const Deposit: React.FC = () => {
                 <div className="flex justify-between items-center gap-3 w-full">
                   <h4 className="text-[#fff] font-[500] capitalize text-sm md:text-lg">first token</h4>
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
-                    available {balance0.toPrecision(4)} {token0?.symbol}
+                    available {balance0.toFixed(4)} {token0?.symbol}
                   </span>
                 </div>
                 <div className="w-full join rounded-[12.8px] border border-[#2b2b2b]">
@@ -372,8 +372,8 @@ const Deposit: React.FC = () => {
                   <span className=" text-[#cfcfcf] font-[500] capitalize text-xs md:text-sm">
                     available{" "}
                     {tknStateData.secondSelectedToken === __ETHER__
-                      ? etherBalance.toPrecision(4)
-                      : token1Balance.toPrecision(4)}{" "}
+                      ? etherBalance.toFixed(4)
+                      : token1Balance.toFixed(4)}{" "}
                     {token1?.symbol}
                   </span>
                 </div>
