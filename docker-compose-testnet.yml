@@ -31,6 +31,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5400:80
+    depends_on:
+      - client
+      - server
 networks:
   testnet-dapp:
     external: false
