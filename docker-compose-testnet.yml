@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 5447:80
+      - 5400:80
 networks:
   testnet-dapp:
     external: false
