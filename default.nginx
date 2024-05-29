@@ -9,6 +9,6 @@ server {
   }
 
   location /api/ {
-    proxy_pass http:server:8811/
+    proxy_pass http:server:8811/;
   }
 }
