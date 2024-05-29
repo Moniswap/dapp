@@ -5,7 +5,6 @@ COPY public /public/
 COPY .env /
 COPY *.json /
 COPY *.mjs /
-COPY next-env.d.ts /
 COPY .graphclientrc.yml /
 RUN yarn
 RUN yarn graph:build && yarn build
