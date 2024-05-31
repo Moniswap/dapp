@@ -12,6 +12,7 @@ import { useChains, useChainId, useSwitchChain, useAccount } from "wagmi";
 import WalletSettingsModal from "@/ui/modals/WalletSettingsModal";
 import WalletConnectModal from "@/ui/modals/WalletConnectModal";
 import { customEllipsize } from "@/helpers/utils";
+import MobileChainSwitchModal from "./modals/MobileChainSwitchModal";
 
 const ActiveLink: React.FC<LinkProps & { children: any }> = ({ href, children, ...props }) => {
   const pathname = usePathname();
@@ -57,6 +58,7 @@ function Header() {
   const { switchChain } = useSwitchChain();
   const walletConnectModalRef = useRef<HTMLInputElement>(null);
   const walletSettingsModalRef = useRef<HTMLInputElement>(null);
+  const mobileChainSwitch = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -193,7 +195,14 @@ function Header() {
                   ))}
                 </ul>
               </details>
-              <button className="bg-[#3e3831] p-2 btn btn-ghost btn-sm flex justify-center items-center md:hidden">
+              <button
+                onClick={() => {
+                  if (mobileChainSwitch.current) {
+                    mobileChainSwitch.current.checked = true;
+                  }
+                }}
+                className="bg-[#3e3831] p-2 btn btn-ghost btn-sm flex justify-center items-center md:hidden"
+              >
                 <Image src={chainInfo.image} width={16} height={16} alt={chainInfo.name} />
               </button>
               {!isConnected ? (
@@ -282,6 +291,12 @@ function Header() {
           }}
         />
       )}
+      <MobileChainSwitchModal
+        ref={mobileChainSwitch}
+        close={() => {
+          if (mobileChainSwitch.current) mobileChainSwitch.current.checked = false;
+        }}
+      />
     </>
   );
 }

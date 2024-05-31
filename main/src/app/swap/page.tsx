@@ -56,13 +56,13 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
               <div className="flex justify-between items-center w-full relative">
                 <LiquidityRouteTokenImage address={token} />
                 {index < tokens.length - 1 && (
-                  <div className="flex flex-col justify-center items-center relative mt-16">
+                  <div className="flex flex-col justify-center items-center relative mt-16 w-full">
                     <div className="rounded-full p-1 bg-[#9a9888] z-10 flex justify-center items-center">
                       <MdKeyboardDoubleArrowRight size={10} color="#fff" />
                     </div>
                     <div className="flex flex-col justify-center items-center -z-40">
-                      <div className="w-[1px] h-8 bg-[#111] -mt-1" />
-                      <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2">
+                      <div className="w-[1px] h-4 md:h-8 bg-[#111] -mt-1" />
+                      <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2 flex justify-center items-center">
                         <LiquidityRouteAdapterName address={adapters[Math.min(index, index + 1)]} />
                       </div>
                     </div>
@@ -211,6 +211,10 @@ const Swap: React.FC = () => {
     }
   }, [amount, token0Balance]);
 
+  useEffect(() => {
+    if (txError) console.error(txError.message);
+  }, [txError]);
+
   return (
     <>
       <div className="w-full flex flex-col md:flex-row justify-start md:justify-center items-center gap-5 px-3 my-6 md:my-40 animate-fade-down animate-once">
@@ -232,7 +236,7 @@ const Swap: React.FC = () => {
                     className="btn btn-ghost join-item h-full flex justify-start items-center gap-3 md:w-1/3"
                   >
                     <Image src={token0?.logoURI ?? ""} height={30} width={30} alt="img" className="rounded-full" />
-                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-lg">{token0?.symbol}</span>
+                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-sm">{token0?.symbol}</span>
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
@@ -272,7 +276,7 @@ const Swap: React.FC = () => {
                     className="btn btn-ghost join-item h-full flex justify-start items-center gap-3 md:w-1/3"
                   >
                     <Image src={token1?.logoURI ?? ""} height={30} width={30} alt="img" className="rounded-full" />
-                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-lg">{token1?.symbol}</span>
+                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-sm">{token1?.symbol}</span>
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
