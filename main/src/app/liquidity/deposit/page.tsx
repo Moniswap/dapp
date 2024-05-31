@@ -210,7 +210,7 @@ const Deposit: React.FC = () => {
     if (queryToken1) {
       const t = tknStateData.tokenlist.find(t => t.address.toLowerCase() === queryToken1.toLowerCase());
 
-      if (t) dispatch(setFirstSelectedToken({ chainId, address: t.address }));
+      if (t) dispatch(setSecondSelectedToken({ chainId, address: t.address }));
     }
 
     if (queryStable) {
