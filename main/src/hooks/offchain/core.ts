@@ -64,7 +64,7 @@ export function useManyPoolsByIDs(poolIds: string[]) {
   return pools;
 }
 
-export function useAllPools(first: number = 6000) {
+export function useAllPools(first: number = 1000) {
   const [pools, setPools] = useState<Pair[]>([]);
   const chainId = useChainId();
   const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
