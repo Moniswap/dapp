@@ -70,5 +70,21 @@
     "name": "Kodiak Token",
     "decimals": 18,
     "logoURI": "https://app.kodiak.finance/images/KodiakToken.svg"
+  },
+  {
+    "chainId": 80085,
+    "address": "0xea74221ebE5c61c71688cB358D9dFFF9324F1b3C",
+    "symbol": "MONI",
+    "name": "Moniswap",
+    "decimals": 18,
+    "logoURI": "https://pbs.twimg.com/profile_images/1746472536487985152/XNAWDMik_400x400.jpg"
+  },
+  {
+    "chainId": 80085,
+    "address": "0x5806E416dA447b267cEA759358cF22Cc41FAE80F",
+    "symbol": "WBERA",
+    "name": "Wrapped Bera",
+    "decimals": 18,
+    "logoURI": "https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/wbera.png"
   }
 ]
