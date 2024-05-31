@@ -249,10 +249,7 @@ const Deposit: React.FC = () => {
 
   useEffect(() => {
     if (txError) {
-      console.error(txError);
-      console.log(txError.message);
-      console.debug(txError.cause);
-      console.info(txError.stack);
+      console.error(txError.message);
     }
   }, [txError]);
 
@@ -338,7 +335,7 @@ const Deposit: React.FC = () => {
                     className="btn btn-ghost join-item h-full flex justify-start items-center gap-3 md:w-1/3"
                   >
                     <Image src={token0?.logoURI ?? ""} height={30} width={30} alt="img" className="rounded-full" />
-                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-lg">{token0?.symbol}</span>
+                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-sm">{token0?.symbol}</span>
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input
@@ -385,7 +382,7 @@ const Deposit: React.FC = () => {
                     className="btn btn-ghost join-item h-full flex justify-start items-center gap-3 md:w-1/3"
                   >
                     <Image src={token1?.logoURI ?? ""} height={30} width={30} alt="img" className="rounded-full" />
-                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-lg">{token1?.symbol}</span>
+                    <span className=" text-[#cfcfcf] font-[500] uppercase text-xs md:text-sm">{token1?.symbol}</span>
                     <FiChevronDown size={20} color="#cfcfcf" />
                   </button>
                   <input

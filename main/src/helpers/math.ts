@@ -1,8 +1,5 @@
-import assert from "assert";
-
 export const div = (dividend: number, divisor: number) => {
-  assert.ok(divisor != 0);
-  return dividend / divisor;
+  return divisor === 0 ? 0 : dividend / divisor;
 };
 
 export const sub = (minuend: number, subtractor: number) => {
