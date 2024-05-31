@@ -57,10 +57,7 @@ export const __PROVIDERS__ = {
 };
 
 export const __RPCS__ = {
-  [__CHAIN_IDS__.bera_testnet]: [
-    { serviceName: "Ankr", url: "https://rpc.ankr.com/berachain_testnet" },
-    { serviceName: "Berachain", url: "https://artio.rpc.berachain.com" }
-  ],
+  [__CHAIN_IDS__.bera_testnet]: [{ serviceName: "Berachain", url: "https://artio.rpc.berachain.com" }],
   [__CHAIN_IDS__.sepolia]: [
     { serviceName: "Tenderly", url: "https://sepolia.gateway.tenderly.co" },
     { serviceName: "Blockpi", url: "https://ethereum-sepolia.blockpi.network/v1/rpc/public" },
@@ -185,21 +182,25 @@ export const __LANGUAGES__ = {
 };
 
 export const __AGGREGATOR_ROUTERS__ = {
-  [__CHAIN_IDS__.bsc_testnet]: "0xA2Af4FAe0d22608E3d34698F03ba4c4f75201a73"
+  [__CHAIN_IDS__.bsc_testnet]: "0xA2Af4FAe0d22608E3d34698F03ba4c4f75201a73",
+  [__CHAIN_IDS__.bera_testnet]: "0xAA08befd320fb7A2BAA295648F27a91056F59064"
 };
 
 export const __PROTOCOL_ROUTERS__ = {
-  [__CHAIN_IDS__.bsc_testnet]: "0xc6b776fAD24f4ac2120ff35c88f3a0B83b9f5b29"
+  [__CHAIN_IDS__.bsc_testnet]: "0xc6b776fAD24f4ac2120ff35c88f3a0B83b9f5b29",
+  [__CHAIN_IDS__.bera_testnet]: "0x9E00033e15e35AfDFD60466D1c5B41E00817C970"
 };
 
 export const __POOL_FACTORIES__ = {
-  [__CHAIN_IDS__.bsc_testnet]: "0x0542fd4b76074eD67d3031D197119e87c4C7d1FA"
+  [__CHAIN_IDS__.bsc_testnet]: "0x0542fd4b76074eD67d3031D197119e87c4C7d1FA",
+  [__CHAIN_IDS__.bera_testnet]: "0xe0C2aC5716da69382a3ba3C20E43b91Ada068Fb6"
 };
 
 export const __ADDRESS_0__ = "0x0000000000000000000000000000000000000000";
 export const __ETHER__ = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const __WRAPPED_ETHER__ = {
-  [__CHAIN_IDS__.bsc_testnet]: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"
+  [__CHAIN_IDS__.bsc_testnet]: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+  [__CHAIN_IDS__.bera_testnet]: "0x5806E416dA447b267cEA759358cF22Cc41FAE80F"
 };
 
 export const __GRAPH_CHAIN_NAMES__ = {
@@ -207,3 +208,10 @@ export const __GRAPH_CHAIN_NAMES__ = {
 };
 
 export const __IDEAL_GAS__ = BigInt(400000);
+
+export const __GRAPH__URLs__ = {
+  [__CHAIN_IDS__.bera_testnet]:
+    "api.goldsky.com/api/public/project_clws3jv71bgap01u93r59ccbm/subgraphs/moniswap-bera-testnet/pools/gn",
+  [__CHAIN_IDS__.bsc_testnet]:
+    "api.goldsky.com/api/public/project_clws3jv71bgap01u93r59ccbm/subgraphs/moniswap/pools/gn"
+};

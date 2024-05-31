@@ -1,4 +1,4 @@
-import { __GRAPH_CHAIN_NAMES__, __POOL_FACTORIES__ } from "@/constants";
+import { __GRAPH_CHAIN_NAMES__, __GRAPH__URLs__, __POOL_FACTORIES__ } from "@/constants";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import {
@@ -19,54 +19,61 @@ export function useFactoryInfo() {
   const chainId = useChainId();
   const id = useMemo(() => __POOL_FACTORIES__[chainId], [chainId]);
   const [poolFactoryInfo, setPoolFactoryInfo] = useState<PoolFactory>();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
     if (!!id) {
-      execute(IndexPoolFactoryInfoDocument, { id })
+      execute(IndexPoolFactoryInfoDocument, { id }, { url })
         .then(({ data }) => setPoolFactoryInfo(data.poolFactory))
         .catch(console.debug);
     }
-  }, [id]);
+  }, [id, url]);
 
   return poolFactoryInfo;
 }
 
 export function useSinglePoolInfo(poolId?: string) {
+  const chainId = useChainId();
   const [poolInfo, setPoolInfo] = useState<Pair>();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
     if (!!poolId) {
-      execute(IndexSinglePairDocument, { id: poolId })
+      execute(IndexSinglePairDocument, { id: poolId }, { url })
         .then(({ data }) => setPoolInfo(data.pair))
         .catch(console.debug);
     }
-  }, [poolId]);
+  }, [poolId, url]);
 
   return poolInfo;
 }
 
 export function useManyPoolsByIDs(poolIds: string[]) {
   const [pools, setPools] = useState<Pair[]>([]);
+  const chainId = useChainId();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
     if (poolIds.length > 0) {
-      execute(IndexManyPoolsUsingIDsDocument, { ids: poolIds })
+      execute(IndexManyPoolsUsingIDsDocument, { ids: poolIds }, { url })
         .then(({ data }) => setPools(data.pairs))
         .catch(console.debug);
     }
-  }, [poolIds]);
+  }, [poolIds, url]);
 
   return pools;
 }
 
 export function useAllPools(first: number = 6000) {
   const [pools, setPools] = useState<Pair[]>([]);
+  const chainId = useChainId();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
-    execute(IndexAllPoolsDocument, { first })
+    execute(IndexAllPoolsDocument, { first }, { url })
       .then(({ data }) => setPools(data.pairs))
       .catch(console.debug);
-  }, [first]);
+  }, [first, url]);
 
   return pools;
 }
@@ -74,14 +81,16 @@ export function useAllPools(first: number = 6000) {
 export function usePoolPositions() {
   const [positions, setPositions] = useState<AccountPosition[]>([]);
   const { address } = useAccount();
+  const chainId = useChainId();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
     if (address) {
-      execute(IndexAccountPositionsDocument, { account: address })
+      execute(IndexAccountPositionsDocument, { account: address }, { url })
         .then(({ data }) => setPositions(data.accountPositions))
         .catch(console.debug);
     }
-  }, [address]);
+  }, [address, url]);
 
   return positions;
 }
@@ -89,14 +98,16 @@ export function usePoolPositions() {
 export function usePoolRewards() {
   const [rewards, setRewards] = useState<Fee[]>([]);
   const { address } = useAccount();
+  const chainId = useChainId();
+  const url = useMemo(() => __GRAPH__URLs__[chainId], [chainId]);
 
   useEffect(() => {
     if (address) {
-      execute(IndexFeesDocument, {})
+      execute(IndexFeesDocument, {}, { url })
         .then(({ data }) => setRewards(data.fees))
         .catch(console.debug);
     }
-  }, [address]);
+  }, [address, url]);
 
   return rewards;
 }
