@@ -1,4 +1,4 @@
-query IndexAllPools($first: Int = 6000) {
+query IndexAllPools($first: Int = 1000) {
   pairs(first: $first, skip: 0) {
     id
     stable
