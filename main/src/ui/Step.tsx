@@ -5,7 +5,8 @@ interface StepProps {
   active?: boolean;
   content: ReactNode;
   customIcon?: ReactNode;
-  hasConnector?: boolean;
+  hasBottomConnector?: boolean;
+  hasTopConnector?: boolean;
 }
 
 interface StepGroupProps {
@@ -13,10 +14,11 @@ interface StepGroupProps {
   children: ReactNode;
 }
 
-function Step({ active, content, customIcon, hasConnector }: StepProps) {
+function Step({ active, content, customIcon, hasBottomConnector, hasTopConnector }: StepProps) {
   return (
-    <div className="flex justify-center gap-3 items-start w-full">
-      <div className="flex flex-col justify-start items-center -space-x-1 w-[10%] self-stretch">
+    <>
+      {hasTopConnector && <hr className="bg-[#9a9888] min-h-6" />}
+      <div className="timeline-middle">
         <div
           className={clsx(
             "flex justify-center items-center py-2 px-2 rounded-[10px] bg-[#47473f] h-8 w-8 md:h-10 md:w-10 z-10",
@@ -28,10 +30,10 @@ function Step({ active, content, customIcon, hasConnector }: StepProps) {
         >
           {customIcon}
         </div>
-        {hasConnector && <div className="bg-[#9a9888] w-[2px] min-h-full" />}
       </div>
-      <div className="flex justify-start items-center w-[90%]">{content}</div>
-    </div>
+      <div className="timeline-end self-start">{content}</div>
+      {hasBottomConnector && <hr className="bg-[#9a9888] min-h-6" />}
+    </>
   );
 }
 
@@ -49,13 +51,14 @@ function StepGroup({ activeStep = -1, children }: StepGroupProps) {
   }, [groupMembers]);
 
   return (
-    <ul className="flex flex-col justify-start items-start w-full gap-8">
+    <ul className="timeline timeline-vertical w-full justify-start items-start timeline-compact">
       {groupMembers.map((x, index) => (
         <li key={index} className="w-full">
           {cloneElement(x as ReactElement, {
             active: index <= activeStep,
             customIcon: (x as ReactElement).props.customIcon ?? <span>{index + 1}</span>,
-            hasConnector: index < groupMembers.length - 1,
+            hasTopConnector: index > 0,
+            hasBottomConnector: index < groupMembers.length - 1,
             key: index
           })}
         </li>
