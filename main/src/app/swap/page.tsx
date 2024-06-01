@@ -1,6 +1,7 @@
 "use client";
 
 import { RootState } from "@/configs/store";
+import React from "react";
 import { setFirstSelectedToken, setSecondSelectedToken } from "@/configs/store/slices/tokensSlice";
 import { useAdapter, useAggregatorRouter } from "@/hooks/onchain/swap";
 import { useERC20Allowance, useERC20Balance, useNativeBalance } from "@/hooks/onchain/wallet";
@@ -48,18 +49,27 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
     <div className="w-full flex flex-col items-start justify-start gap-5">
       <h3 className="capitalize font-[400] text-sm md:text-lg text-[#cfcfcf]">liquidity routing</h3>
       <div className="h-[1px] w-full bg-[#2b2b2b]" />
-      <div className="w-full relative flex justify-center items-center -mt-3 overflow-x-auto">
-        <div className="border-b border-dashed h-[1px] w-full bg-[#9a9888] absolute top-[50%]" />
-        <ul className="flex justify-between items-center w-full z-[100]">
+      <div className="w-full flex justify-start items-center -mt-3 overflow-x-auto">
+        {/* <div className="border-b border-dashed h-[1px] w-full bg-[#9a9888] absolute top-[50%]" /> */}
+        <ul className="timeline w-full">
           {tokens.map((token, index) => (
-            <li key={index} style={{ width: index < tokens.length - 1 ? `${(1 / tokens.length) * 100}%` : undefined }}>
-              <div className="flex justify-between items-center w-full relative">
-                <LiquidityRouteTokenImage address={token} />
-                {index < tokens.length - 1 && (
-                  <div className="flex flex-col justify-center items-center mt-16 w-full">
-                    <div className="rounded-full p-1 bg-[#9a9888] z-10 flex justify-center items-center">
+            <React.Fragment key={index}>
+              <li className="flex-grow">
+                {index > 0 && <hr className="bg-[#9a9888] h-[1px] border-b border-dashed" />}
+                <div className="timeline-middle">
+                  <LiquidityRouteTokenImage address={token} />
+                </div>
+                {index < tokens.length - 1 && <hr className="bg-[#9a9888] h-[1px] border-b border-dashed" />}
+              </li>
+              {index < tokens.length - 1 && (
+                <li className="flex-grow">
+                  <hr className="bg-[#9a9888] h-[1px] border-b border-dashed" />
+                  <div className="timeline-middle">
+                    <div className="rounded-full p-1 bg-[#9a9888] flex justify-center items-center">
                       <MdKeyboardDoubleArrowRight size={10} color="#fff" />
                     </div>
+                  </div>
+                  <div className="timeline-end">
                     <div className="flex flex-col justify-center items-center -z-40 w-full">
                       <div className="w-[1px] h-4 md:h-8 bg-[#111] -mt-1" />
                       <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2 flex flex-nowrap overflow-clip justify-center items-center w-[80%] md:w-[90%]">
@@ -67,9 +77,10 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </li>
+                  <hr className="bg-[#9a9888] h-[1px] border-b border-dashed" />
+                </li>
+              )}
+            </React.Fragment>
           ))}
         </ul>
       </div>
@@ -306,187 +317,189 @@ const Swap: React.FC = () => {
                 <h4 className=" text-[#fff] font-[500] capitalize text-lg md:text-xl">swap</h4>
                 <Image src="/images/hive.svg" width={60} height={60} alt="hive" />
               </div>
-              <StepGroup activeStep={activeStep}>
-                <Step
-                  customIcon={activeStep >= 0 ? <MdOutlineCalculate /> : undefined}
-                  content={
-                    <>
-                      {amount <= 0 ? (
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                          Start by selecting the token to swap from and the amount you want to exchange
-                        </span>
-                      ) : (
-                        <>
-                          {bestQueryFetching ? (
-                            <div className="flex justify-start gap-1 items-center w-full">
-                              <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                                Searching for ideal rate...
-                              </span>
-                              <span className="loading loading-sm loading-spinner text-[#f5f5f5]"></span>
-                            </div>
-                          ) : (
-                            <>
-                              {bestQueryData &&
-                              bestQueryData.adapter &&
-                              bestQueryData.amountOut > 0 &&
-                              !bestQueryError ? (
-                                <div className="flex flex-col justify-start items-start gap-2">
-                                  <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                                    Best exchange rate found
-                                  </span>
-                                  <div className="flex justify-start items-center w-full gap-2">
-                                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
-                                      1 {token0?.symbol}
-                                    </span>
-                                    <IoIosSwap color="#cfcfcf" size={20} />
-                                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
-                                      {(amountOutFormatted / amount).toFixed(3)} {token1?.symbol}
-                                    </span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                                  No rate was found
-                                </span>
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
-                    </>
-                  }
-                />
-                <Step
-                  customIcon={activeStep >= 1 ? <FiPlusSquare /> : undefined}
-                  content={
-                    <>
-                      {activeStep >= 1 ? (
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                          {slippage}% slippage applied.
-                        </span>
-                      ) : (
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                          Pick the token you want to exchange for
-                        </span>
-                      )}
-                    </>
-                  }
-                />
-                <Step
-                  customIcon={activeStep >= 2 ? <CgArrowsExchangeV /> : undefined}
-                  content={
-                    <>
-                      {activeStep >= 2 && bestQueryData ? (
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
-                          Minimum received:
-                          {amountOutFormatted.toFixed(4)} {token1?.symbol}
-                        </span>
-                      ) : (
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
-                          The quotes will be ready in a moment
-                        </span>
-                      )}
-                    </>
-                  }
-                />
-                {amount > 0 && tknStateData.firstSelectedToken !== __ETHER__ && (
+              <div className="flex justify-start items-start w-full">
+                <StepGroup activeStep={activeStep}>
                   <Step
-                    customIcon={
-                      allowanceFetching ? (
-                        <span className="loading loading-spinner loading-sm text-[#fff]"></span>
-                      ) : (
-                        <>
-                          {!allowance || allowedToSpend < amount ? (
-                            <FaLock color={allowanceError ? "#800020" : "#bab300"} />
-                          ) : (
-                            <FaUnlockKeyhole />
-                          )}
-                        </>
-                      )
-                    }
+                    customIcon={activeStep >= 0 ? <MdOutlineCalculate /> : undefined}
                     content={
                       <>
-                        {allowanceFetching ? (
-                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
-                            Checking allowance for {token0?.symbol}
+                        {amount <= 0 ? (
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                            Start by selecting the token to swap from and the amount you want to exchange
                           </span>
                         ) : (
                           <>
-                            {!allowance || allowedToSpend < amount ? (
-                              <div className="flex flex-col justify-start items-start gap-2">
+                            {bestQueryFetching ? (
+                              <div className="flex justify-start gap-1 items-center w-full">
                                 <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                                  Allowance too low for {token0?.symbol}
+                                  Searching for ideal rate...
                                 </span>
-                                <button
-                                  disabled={
-                                    allowedToSpend >= amount ||
-                                    !isConnected ||
-                                    tknStateData.firstSelectedToken === __ETHER__
-                                  }
-                                  onClick={executeApproval}
-                                  className="bg-[#1e1e1e] border border-[#2b2b2b] capitalize px-4 py-3 flex justify-center items-center rounded-[12.8px] gap-2"
-                                >
-                                  <span className="text-[#cfcfcf] text-sm md:text-xl">
-                                    Allow to spend {token0?.symbol}
-                                  </span>
-                                  <FaLock color="#fff" size={16} />
-                                </button>
+                                <span className="loading loading-sm loading-spinner text-[#f5f5f5]"></span>
                               </div>
                             ) : (
-                              <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                                Approved to spend {token0?.symbol}
-                              </span>
+                              <>
+                                {bestQueryData &&
+                                bestQueryData.adapter &&
+                                bestQueryData.amountOut > 0 &&
+                                !bestQueryError ? (
+                                  <div className="flex flex-col justify-start items-start gap-2">
+                                    <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                                      Best exchange rate found
+                                    </span>
+                                    <div className="flex justify-start items-center w-full gap-2">
+                                      <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
+                                        1 {token0?.symbol}
+                                      </span>
+                                      <IoIosSwap color="#cfcfcf" size={20} />
+                                      <span className="text-[#cfcfcf] text-sm md:text-lg text-justify uppercase font-medium">
+                                        {(amountOutFormatted / amount).toFixed(3)} {token1?.symbol}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                                    No rate was found
+                                  </span>
+                                )}
+                              </>
                             )}
                           </>
                         )}
                       </>
                     }
                   />
-                )}
-                {(approvalPending || swapPending || amount > 0) && !swapHash && (
                   <Step
-                    customIcon={<span className="loading loading-spinner loading-sm text-[#cfcfcf]"></span>}
+                    customIcon={activeStep >= 1 ? <FiPlusSquare /> : undefined}
                     content={
-                      <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                        Waiting for pending actions
-                      </span>
+                      <>
+                        {activeStep >= 1 ? (
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                            {slippage}% slippage applied.
+                          </span>
+                        ) : (
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                            Pick the token you want to exchange for
+                          </span>
+                        )}
+                      </>
                     }
                   />
-                )}
-                {(swapSuccess || !!swapHash) && (
                   <Step
-                    customIcon={<PiConfetti />}
+                    customIcon={activeStep >= 2 ? <CgArrowsExchangeV /> : undefined}
                     content={
-                      <div className="flex flex-col justify-start items-start gap-2">
-                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">Swap completed</span>
-                        <a href={txUrl} target="_blank" className="flex justify-center items-center gap-2">
-                          <span className="text-[#cfcfcf] text-sm underline">View on explorer</span>
-                          <FiExternalLink color="#cfcfcf" size={16} />
-                        </a>
-                        <a
-                          onClick={() => {
-                            resetSwap();
-                            setAmount(0);
-                          }}
-                          className="flex justify-center items-center cursor-pointer"
-                        >
-                          <span className="text-[#cfcfcf] text-sm underline capitalize">reset</span>
-                        </a>
-                      </div>
+                      <>
+                        {activeStep >= 2 && bestQueryData ? (
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                            Minimum received:
+                            {amountOutFormatted.toFixed(4)} {token1?.symbol}
+                          </span>
+                        ) : (
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                            The quotes will be ready in a moment
+                          </span>
+                        )}
+                      </>
                     }
                   />
-                )}
-                {!!swapError && (
-                  <Step
-                    customIcon={<MdOutlineError color="#800020" />}
-                    content={
-                      <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
-                        Error occured while swapping
-                      </span>
-                    }
-                  />
-                )}
-              </StepGroup>
+                  {amount > 0 && tknStateData.firstSelectedToken !== __ETHER__ && (
+                    <Step
+                      customIcon={
+                        allowanceFetching ? (
+                          <span className="loading loading-spinner loading-sm text-[#fff]"></span>
+                        ) : (
+                          <>
+                            {!allowance || allowedToSpend < amount ? (
+                              <FaLock color={allowanceError ? "#800020" : "#bab300"} />
+                            ) : (
+                              <FaUnlockKeyhole />
+                            )}
+                          </>
+                        )
+                      }
+                      content={
+                        <>
+                          {allowanceFetching ? (
+                            <span className="text-[#cfcfcf] text-sm md:text-lg text-justify ">
+                              Checking allowance for {token0?.symbol}
+                            </span>
+                          ) : (
+                            <>
+                              {!allowance || allowedToSpend < amount ? (
+                                <div className="flex flex-col justify-start items-start gap-2">
+                                  <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                                    Allowance too low for {token0?.symbol}
+                                  </span>
+                                  <button
+                                    disabled={
+                                      allowedToSpend >= amount ||
+                                      !isConnected ||
+                                      tknStateData.firstSelectedToken === __ETHER__
+                                    }
+                                    onClick={executeApproval}
+                                    className="bg-[#1e1e1e] border border-[#2b2b2b] capitalize px-4 py-3 flex justify-center items-center rounded-[12.8px] gap-2"
+                                  >
+                                    <span className="text-[#cfcfcf] text-sm md:text-xl">
+                                      Allow to spend {token0?.symbol}
+                                    </span>
+                                    <FaLock color="#fff" size={16} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                                  Approved to spend {token0?.symbol}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </>
+                      }
+                    />
+                  )}
+                  {(approvalPending || swapPending || amount > 0) && !swapHash && (
+                    <Step
+                      customIcon={<span className="loading loading-spinner loading-sm text-[#cfcfcf]"></span>}
+                      content={
+                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                          Waiting for pending actions
+                        </span>
+                      }
+                    />
+                  )}
+                  {(swapSuccess || !!swapHash) && (
+                    <Step
+                      customIcon={<PiConfetti />}
+                      content={
+                        <div className="flex flex-col justify-start items-start gap-2">
+                          <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">Swap completed</span>
+                          <a href={txUrl} target="_blank" className="flex justify-center items-center gap-2">
+                            <span className="text-[#cfcfcf] text-sm underline">View on explorer</span>
+                            <FiExternalLink color="#cfcfcf" size={16} />
+                          </a>
+                          <a
+                            onClick={() => {
+                              resetSwap();
+                              setAmount(0);
+                            }}
+                            className="flex justify-center items-center cursor-pointer"
+                          >
+                            <span className="text-[#cfcfcf] text-sm underline capitalize">reset</span>
+                          </a>
+                        </div>
+                      }
+                    />
+                  )}
+                  {!!swapError && (
+                    <Step
+                      customIcon={<MdOutlineError color="#800020" />}
+                      content={
+                        <span className="text-[#cfcfcf] text-sm md:text-lg text-justify">
+                          Error occured while swapping
+                        </span>
+                      }
+                    />
+                  )}
+                </StepGroup>
+              </div>
               {/* <ul className="steps steps-vertical">
               <li className="step step-warning">
                 <span className="text-[#cfcfcf] text-xs md:text-sm text-justify">
