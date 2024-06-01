@@ -24,7 +24,7 @@ import { PiConfetti } from "react-icons/pi";
 const LiquidityRouteAdapterName: React.FC<{ address: string }> = ({ address }) => {
   const { useName } = useAdapter(address as any);
   const { data } = useName();
-  return <span className="text-[#cfcfcf] font-[400] text-xs capitalize">{data ?? "unknown"}</span>;
+  return <span className="text-[#cfcfcf] font-[400] text-[8px] md:text-xs capitalize">{data ?? "unknown"}</span>;
 };
 
 const LiquidityRouteTokenImage: React.FC<{ address: string }> = ({ address }) => {
@@ -56,13 +56,13 @@ const LiquidityRoute: React.FC<{ adapters: readonly `0x${string}`[]; tokens: rea
               <div className="flex justify-between items-center w-full relative">
                 <LiquidityRouteTokenImage address={token} />
                 {index < tokens.length - 1 && (
-                  <div className="flex flex-col justify-center items-center relative mt-16 w-full">
+                  <div className="flex flex-col justify-center items-center mt-16 w-full">
                     <div className="rounded-full p-1 bg-[#9a9888] z-10 flex justify-center items-center">
                       <MdKeyboardDoubleArrowRight size={10} color="#fff" />
                     </div>
-                    <div className="flex flex-col justify-center items-center -z-40">
+                    <div className="flex flex-col justify-center items-center -z-40 w-full">
                       <div className="w-[1px] h-4 md:h-8 bg-[#111] -mt-1" />
-                      <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2 flex justify-center items-center">
+                      <div className="bg-[#111] rounded-[8px] px-3 py-3 -mt-2 flex flex-nowrap overflow-clip justify-center items-center w-[80%] md:w-[90%]">
                         <LiquidityRouteAdapterName address={adapters[Math.min(index, index + 1)]} />
                       </div>
                     </div>

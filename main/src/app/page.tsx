@@ -9,7 +9,7 @@ export default function Home() {
       <section className="w-full animate-fade-down animate-once">
         <div className="flex w-full mx-auto items-center justify-center h-fit md:h-screen flex-col py-20 md:py-0">
           <div className="flex flex-col justify-center text-center">
-            <h1 className="capitalize text-sm py-2 font-[500] leading-[18px]">WELCOME TO MONISWAP</h1>
+            <h1 className="text-sm py-2 font-[500] leading-[18px] uppercase">welcome to moniswap</h1>
             <h1 className="max-w-[21ch] text-[30.5px] md:text-[45px] flex flex-col text-white md:leading-[50px] leading-[45px]">
               The central hub for trading &amp; liquidity marketplaces on
               <span className="justify-center flex items-center text-[45px]">
