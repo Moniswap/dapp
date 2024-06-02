@@ -31,7 +31,7 @@ function Step({ active, content, customIcon, hasBottomConnector, hasTopConnector
           {customIcon}
         </div>
       </div>
-      <div className="timeline-end self-start">{content}</div>
+      <div className="timeline-end">{content}</div>
       {hasBottomConnector && <hr className="bg-[#9a9888] min-h-6" />}
     </>
   );
