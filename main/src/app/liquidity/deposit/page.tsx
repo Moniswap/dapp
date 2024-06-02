@@ -390,7 +390,7 @@ const Deposit: React.FC = () => {
                     onChange={ev =>
                       setAmount1In(Number(parseFloat(!!ev.target.value ? ev.target.value : "0").toFixed(3)))
                     }
-                    disabled={poolAddress !== __ADDRESS_0__ && Number(totalSupply) > 0 && amount1In > 0}
+                    disabled={poolAddress !== __ADDRESS_0__ && Number(totalSupply) > 0}
                     value={
                       poolAddress !== __ADDRESS_0__ && !!quote && Number(quote[1]) > 0 && Number(totalSupply) > 0
                         ? amount1In
