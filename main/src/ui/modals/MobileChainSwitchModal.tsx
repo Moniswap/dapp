@@ -26,7 +26,7 @@ const MobileChainSwitchModal = forwardRef<HTMLInputElement, { close?: () => void
           >
             <FiX size={20} />
           </label>
-          <ul className="p-2 w-full dropdown-content menu rounded-[5px] z-[1] bg-[#111111] menu-lg">
+          <ul className="p-2 w-full menu rounded-[5px] z-[1] bg-[#111111] menu-lg">
             <li className="menu-title">
               <div className="flex justify-start items-center w-full">
                 <span className="capitalize font-[400] text-[#cfcfcf] text-lg">select network</span>
