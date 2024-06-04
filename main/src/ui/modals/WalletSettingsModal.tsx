@@ -117,7 +117,7 @@ const WalletSettingsModal = forwardRef<HTMLInputElement, ModalProps>(({ close },
                       <button
                         style={{ width: `${(1 / slippageToleranceOptions.length) * 100}%` }}
                         key={index}
-                        className={`flex justify-center items-center text-center py-3 border-none font-[700]  text-[#cfcfcf] text-sm ${
+                        className={`flex justify-center items-center text-center py-3 border-none font-[700]  text-[#cfcfcf] text-xs md:text-sm ${
                           index === 0 && "rounded-l-xl"
                         } ${index === slippageToleranceOptions.length - 1 && "rounded-r-xl"} ${
                           option === slippageTolerance ? "bg-[#FC8415]" : "bg-transparent"
