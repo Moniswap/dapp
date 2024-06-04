@@ -28,12 +28,8 @@ const WalletConnectModal = forwardRef<HTMLInputElement, ModalProps>(({ close }, 
 
           <div className="flex flex-col px-2 md:px-6 gap-4 w-full max-md:pl-5 max-md:max-w-full">
             <div className="flex flex-col justify-start items-start gap-4">
-              <h1 className="text-xl md:text-3xl text-white italic font-medium max-md:max-w-full">
-                Welcome to Moniswap
-              </h1>
-              <p className="text-base italic text-stone-300 max-md:max-w-full">
-                To get started, please connect your wallet.
-              </p>
+              <h1 className="text-xl md:text-3xl text-white font-medium max-md:max-w-full">Welcome to Moniswap</h1>
+              <p className="text-base text-stone-300 max-md:max-w-full">To get started, please connect your wallet.</p>
             </div>
             <div className="flex flex-col justify-start items-center w-full overflow-auto gap-5 max-sm:h-96">
               {connectors
@@ -56,7 +52,7 @@ const WalletConnectModal = forwardRef<HTMLInputElement, ModalProps>(({ close }, 
                       height={24}
                       className="shrink-0 self-stretch my-auto w-6 aspect-square"
                     />
-                    <div className="flex-auto self-stretch my-auto italic text-sm md:text-lg">
+                    <div className="flex-auto self-stretch my-auto text-sm md:text-lg">
                       Connect with {__PROVIDERS__[connector.id as keyof typeof __PROVIDERS__]?.name}
                     </div>
                   </button>
