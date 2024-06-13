@@ -2,7 +2,7 @@ FROM node:20-alpine
 WORKDIR /dapp
 COPY src /src/
 COPY public /public/
-COPY .env /
+COPY ./.env /
 COPY *.json /
 COPY tailwind.config.ts /
 COPY *.mjs /
